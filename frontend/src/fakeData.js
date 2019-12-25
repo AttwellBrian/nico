@@ -1,12 +1,14 @@
 var map = {
   id: "US",
   name: "United States",
+  width: 3023,
+  height: 1956,
   cities: {
     seattle: {
       name: "Seattle",
       id: "seattle",
-      x: "0.1",
-      y: "0.9",
+      top: "0.15",
+      left: "0.1",
       section: "purple",
       connections: {
         billings: {
@@ -29,8 +31,8 @@ var map = {
     portland: {
       name: "Portland",
       id: "portland",
-      x: "0.05",
-      y: "0.8",
+      top: "0.28",
+      left: "0.08",
       section: "purple",
       connections: {
         seattle: {
@@ -48,8 +50,8 @@ var map = {
     boise: {
       name: "Boise",
       id: "boise",
-      x: "0.15",
-      y: "0.75",
+      top: "0.3",
+      left: "0.18",
       section: "purple",
       connections: {
         seattle: {
@@ -72,8 +74,8 @@ var map = {
     billings: {
       name: "Billings",
       id: "billings",
-      x: "0.30",
-      y: "0.8",
+      top: "0.22",
+      left: "0.32",
       section: "purple",
       connections: {
         seattle: {

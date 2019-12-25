@@ -73,7 +73,7 @@
 
 .connections {
   position: absolute;
-  z-index: 999;
+  z-index: 5;
 }
 
 .connectionPipesContainer {
@@ -84,9 +84,29 @@
 
 .connectionPipe {
   height: 20px;
-  transform-origin: top left;
-  background-color: #000;
+  background-image: url("./assets/images/copperPipe.jpg");
+  background-repeat: repeat-x;
+  background-size: contain;
   position: absolute;
+  transform-origin: top left;
+  margin-top: 70px;
   margin-left: 80px;
-  margin-bottom: 70px;
+}
+
+.connectionCost {
+  background-color: #fff;
+  color: #333;
+  font-family: "chaparral-pro";
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 20px;
+  position: absolute;
+  margin-top: 55px;
+  margin-left: 42px;
+  z-index: 100;
+  padding: 10px;
+  border-radius: 50%;
+  width: 30px;
+  border: solid 5px #333;
+  text-align: center;
 }

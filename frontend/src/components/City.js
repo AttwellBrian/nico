@@ -10,10 +10,10 @@ class City extends React.Component {
 
   render() {
     // render city position
-    var cssBottom = this.props.y * 100 + "%";
-    var cssLeft = this.props.x * 100 + "%";
+    var cssTop = this.props.top * 100 + "%";
+    var cssLeft = this.props.left * 100 + "%";
     var positionStyle = {
-      bottom: cssBottom,
+      top: cssTop,
       left: cssLeft
     };
 
