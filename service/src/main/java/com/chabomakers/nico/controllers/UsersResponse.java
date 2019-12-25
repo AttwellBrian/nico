@@ -8,8 +8,6 @@ import org.immutables.value.Value;
 @Gson.TypeAdapters
 @Value.Immutable
 @Value.Style(allowedClasspathAnnotations = {Generated.class}) // Because ErrorProne+JDK8.
-interface ExampleResponse {
-  List<String> items();
-
-  String description();
+interface UsersResponse {
+  List<User> users();
 }
