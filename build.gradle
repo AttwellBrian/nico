@@ -1,0 +1,7 @@
+// This file is for project wide build configs. When in doubt where code belongs, inline code into module's build.gradle
+
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+}
