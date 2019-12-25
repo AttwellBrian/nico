@@ -1,8 +1,8 @@
 package com.chabomakers.nico;
 
-import com.chabomakers.nico.controllers.UsersController;
-import com.chabomakers.nico.database.DbSecrets;
-import com.chabomakers.nico.database.RealDatabase;
+import com.chabomakers.nico.controllers.CreateUserController;
+import com.chabomakers.nico.controllers.GameStateController;
+import com.chabomakers.nico.controllers.StartGameController;
 import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -14,7 +14,6 @@ import dagger.multibindings.IntoSet;
 import java.util.ServiceLoader;
 import java.util.Set;
 import javax.inject.Singleton;
-import javax.sql.DataSource;
 
 @Module
 abstract class ServerModule {
@@ -31,17 +30,19 @@ abstract class ServerModule {
 
   @Binds
   @IntoSet
-  abstract Controller projectsController(UsersController controller);
+  abstract Controller startGameController(StartGameController controller);
+
+  @Binds
+  @IntoSet
+  abstract Controller usersController(GameStateController controller);
+
+  @Binds
+  @IntoSet
+  abstract Controller createUserController(CreateUserController controller);
 
   @Provides
   static Set<Interceptor> interceptorList() {
     // Empty list for now. Will add more later.
     return Sets.newHashSet();
-  }
-
-  @Singleton
-  @Provides
-  static DataSource dataSource() {
-    return RealDatabase.buildDataSource(new DbSecrets());
   }
 }
