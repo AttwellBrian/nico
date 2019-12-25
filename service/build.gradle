@@ -1,0 +1,89 @@
+plugins {
+  id "application"
+  id "jacoco"
+  id "java"
+  id "com.github.sherter.google-java-format" version "0.8"
+  id "com.bmuschko.docker-java-application" version "4.8.0"
+}
+
+sourceCompatibility = 1.8
+mainClassName = "com.chabomakers.nico.Main"
+
+repositories {
+  mavenCentral()
+}
+
+def versions = [
+    "dagger"             : "2.17",
+    "gson"               : "2.8.5",
+    'immutables'         : '2.7.5',
+]
+
+dependencies {
+  annotationProcessor "com.google.dagger:dagger-compiler:${versions.dagger}"
+  annotationProcessor "org.immutables:value:${versions.immutables}"
+  annotationProcessor "org.immutables:gson:${versions.immutables}"
+
+  implementation "com.google.guava:guava:28.0-jre"
+  implementation "com.sparkjava:spark-core:2.9.1"
+  implementation "ch.qos.logback:logback-classic:1.2.3"
+  implementation "org.codehaus.janino:janino:3.0.12"
+  implementation "net.logstash.logback:logstash-logback-encoder:5.3"
+  implementation "org.immutables:value:${versions.immutables}"
+  implementation "org.immutables:gson:${versions.immutables}"
+  implementation "com.google.dagger:dagger:${versions.dagger}"
+  implementation "com.google.code.gson:gson:${versions.gson}"
+
+  testImplementation "org.mockito:mockito-core:2.27.0"
+  testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.2"
+  testImplementation "org.junit.jupiter:junit-jupiter-params:5.4.2"
+  testImplementation "org.hamcrest:hamcrest:2.1"
+  testRuntime "org.junit.jupiter:junit-jupiter-engine:5.4.2"
+  testRuntime "org.junit.vintage:junit-vintage-engine:5.4.2"
+}
+
+// Tests must be configured if using junit 5.
+test {
+  useJUnitPlatform()
+}
+
+jacocoTestReport {
+  def excludes = ["**/**_**",
+                  "**/Main.class"]
+
+  afterEvaluate {
+    classDirectories.from = files(classDirectories.files.collect {
+      fileTree(dir: it, excludes: excludes)
+    })
+  }
+
+  reports {
+    xml.enabled true
+    xml.destination file("${buildDir}/coverage.xml")
+  }
+}
+
+docker {
+  javaApplication {
+    baseImage = "docker.artifactory.cloudkitchens.internal/jre8-grpc-probe:2.3.0"
+    tag = "nico"
+    ports = [8080, 5005]
+  }
+}
+
+// Copy files into the directory we base docker image off so we can include these in `dockerCreateDockerfile` step.
+dockerSyncBuildContext {
+  from file('docker_entrypoint.sh')
+}
+
+dockerCreateDockerfile {
+  instruction "ENV MAIN_CLASS_NAME=$mainClassName"
+
+  // The Docker gradle plugin will set its own entrypoint. We want to use the
+  // entrypoint specified in our base image, so we set that explicitly.
+  instruction "COPY docker_entrypoint.sh /app/docker_entrypoint.sh"
+  instruction "RUN chmod +x /app/docker_entrypoint.sh"
+  entryPoint "/app/docker_entrypoint.sh"
+}
+
+compileJava.dependsOn "googleJavaFormat"

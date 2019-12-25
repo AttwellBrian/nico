@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  nico:
+    image: "nico"
+    environment:
+      # Additional JVM flags can be passed by providing a whitespace-separated list of flags
+      - >
+        JAVA_OPTS=
+          -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
+          -XX:+PrintGC
+          -XX:+PrintGCDateStamps
+          -XX:+PrintGCTimeStamps
+      # In case we key off of being in dev or prod.
+      - EXECUTION_ENVIRONMENT=dev
+    ports:
+      - 5005:5005
+      - 8080:8080
+      - 8778:8778
