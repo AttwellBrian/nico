@@ -7,7 +7,7 @@ import ConnectionPipe from "./components/ConnectionPipe";
 import * as tools from "./functions";
 
 function App() {
-  // prep map
+  // Prep map data
   var citiesArray = [];
   var connectionsArray = [];
 
@@ -37,9 +37,8 @@ function App() {
     );
   });
 
-  // Render Connections
-  // list all connections
-  // Remove Repeats
+  // Pipe Connections
+  // remove repeats
   for (var i in connectionsArray) {
     for (var t in connectionsArray) {
       if (
@@ -50,6 +49,7 @@ function App() {
       }
     }
   }
+  // render connections
   var allConnections = connectionsArray.map((connection, index) => {
     return (
       <ConnectionPipe
@@ -60,7 +60,6 @@ function App() {
       />
     );
   });
-  console.log(connectionsArray);
 
   return (
     <div className="App">

@@ -9,5 +9,4 @@ function radians_to_degrees(radians) {
 }
 
 export { pyth };
-
 export { radians_to_degrees };
