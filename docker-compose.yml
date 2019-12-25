@@ -1,8 +1,8 @@
 version: "3"
 
 services:
-  blueprint:
-    image: "blueprint"
+  nico:
+    image: "nico"
     environment:
       # Additional JVM flags can be passed by providing a whitespace-separated list of flags
       - >

@@ -66,7 +66,7 @@ jacocoTestReport {
 docker {
   javaApplication {
     baseImage = "docker.artifactory.cloudkitchens.internal/jre8-grpc-probe:2.3.0"
-    tag = "blueprint"
+    tag = "nico"
     ports = [8080, 5005]
   }
 }
