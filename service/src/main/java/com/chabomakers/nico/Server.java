@@ -1,6 +1,5 @@
 package com.chabomakers.nico;
 
-import com.chabomakers.nico.database.RealDatabase;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
 import java.util.Set;
@@ -20,20 +19,13 @@ public class Server {
   private final Set<Controller> controllers;
   private final InterceptorFilter filter;
   private final Gson gson;
-  private final RealDatabase realDatabase;
 
   @Inject
-  Server(
-      Spark spark,
-      Set<Controller> controllers,
-      InterceptorFilter filter,
-      Gson gson,
-      RealDatabase realDatabase) {
+  Server(Spark spark, Set<Controller> controllers, InterceptorFilter filter, Gson gson) {
     this.spark = spark;
     this.controllers = controllers;
     this.filter = filter;
     this.gson = gson;
-    this.realDatabase = realDatabase;
   }
 
   /** Runs the server until termination. */
@@ -52,8 +44,6 @@ public class Server {
                   spark.stop();
                   LOGGER.info("Server is no longer serving traffic.");
                 }));
-
-    realDatabase.initialize();
 
     spark.staticFileLocation("/release/");
 
