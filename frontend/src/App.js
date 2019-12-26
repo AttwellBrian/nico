@@ -1,4 +1,4 @@
-import React, { useReducer } from "react";
+import React from "react";
 import "./App.css";
 import mainMapImage from "./assets/images/usmap-background.jpg";
 import { map, userProfile, gameState, powerPlants } from "./fakeData";
@@ -93,15 +93,15 @@ class App extends React.Component {
 
   render() {
     // Prep map data
-    var citiesArray = [];
-    var connectionsArray = [];
+    let citiesArray = [];
+    let connectionsArray = [];
 
-    for (var key in map.cities) {
+    for (let key in map.cities) {
       // add all cities to an array
       citiesArray.push(map.cities[key]);
 
       // add all connections to an array
-      for (var connection in map.cities[key].connections) {
+      for (let connection in map.cities[key].connections) {
         connectionsArray.push({
           startCity: key,
           endCity: map.cities[key].connections[connection].id,
@@ -110,7 +110,7 @@ class App extends React.Component {
       }
     }
 
-    var cities = citiesArray.map((city, index) => {
+    const cities = citiesArray.map((city, index) => {
       return (
         <City
           key={index}
@@ -124,18 +124,26 @@ class App extends React.Component {
 
     // Pipe Connections
     // remove repeats
-    for (var i in connectionsArray) {
-      for (var t in connectionsArray) {
-        if (
-          connectionsArray[i].startCity === connectionsArray[t].endCity &&
-          connectionsArray[i].endCity === connectionsArray[t].startCity
-        ) {
-          connectionsArray.splice(t, 1);
-        }
+    let uniqueConnectionsArray = [];
+
+    for (let i in connectionsArray) {
+      // create an array of duplicate connections
+      let duplicatesArray = uniqueConnectionsArray.filter(
+        // eslint-disable-next-line no-loop-func
+        connection =>
+          (connection.startCity === connectionsArray[i].startCity &&
+            connection.endCity === connectionsArray[i].endCity) ||
+          (connection.startCity === connectionsArray[i].endCity &&
+            connection.endCity === connectionsArray[i].startCity)
+      );
+      // if no duplicates, then add new unique connection
+      if (duplicatesArray.length === 0) {
+        uniqueConnectionsArray.push(connectionsArray[i]);
       }
     }
+
     // render connections
-    var allConnections = connectionsArray.map((connection, index) => {
+    const allConnections = uniqueConnectionsArray.map((connection, index) => {
       return (
         <ConnectionPipe
           key={index}

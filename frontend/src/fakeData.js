@@ -1,4 +1,4 @@
-var map = {
+const map = {
   id: "US",
   name: "United States",
   width: 3023,
@@ -93,7 +93,7 @@ var map = {
   }
 };
 
-var powerPlants = {
+const powerPlants = {
   1: {
     type: "oil",
     cost: 3,
@@ -237,7 +237,7 @@ var powerPlants = {
     cost: 26,
     resourcesNeeded: 2,
     citiesPowered: 5
-  }
+  },
   25: {
     type: "ecological",
     cost: 27,
@@ -346,16 +346,15 @@ var powerPlants = {
     resourcesNeeded: 0,
     citiesPowered: 6
   }
-
 };
 
-var userProfile = {
+const userProfile = {
   name: "Lightning Bug, LLC.",
   color: "blue",
   uuid: "PLYR1"
 };
 
-var gameState = {
+const gameState = {
   players: {
     PLYR1: {
       name: "Lightning Bug, LLC.",
