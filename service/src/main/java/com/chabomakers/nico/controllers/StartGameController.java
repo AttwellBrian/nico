@@ -23,6 +23,6 @@ public class StartGameController implements Controller {
   @Override
   public GameStateResponse post(Request request, Response response) {
     memoryDatabase.startGame();
-    return GameStateController.getGameStateResponse(memoryDatabase);
+    return memoryDatabase.gameState();
   }
 }

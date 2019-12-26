@@ -9,7 +9,7 @@ import org.immutables.value.Value;
 @Gson.TypeAdapters
 @Value.Immutable
 @Value.Style(allowedClasspathAnnotations = {Generated.class}) // Because ErrorProne+JDK8.
-interface User {
+public interface User {
   UUID id();
 
   String name();
