@@ -84,6 +84,18 @@ public class PowerPlantMarket {
     return cards.stream().skip(4).limit(4).collect(Collectors.toList());
   }
 
+  public void removeCard(PowerPlantCard currentPlant) {
+    cards.remove(currentPlant);
+  }
+
+  public PowerPlantCard getCard(Integer choosePlantId) {
+    return cards
+        .stream()
+        .filter(card -> card.minimumAcceptableBid() == choosePlantId)
+        .findFirst()
+        .get();
+  }
+
   private Stream<PowerPlantCard> sortedStream() {
     return cards.stream().sorted(Comparator.comparingInt(PowerPlantCard::minimumAcceptableBid));
   }

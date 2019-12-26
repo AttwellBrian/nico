@@ -7,6 +7,7 @@ import com.chabomakers.nico.controllers.GameStateResponse;
 import com.chabomakers.nico.controllers.ImmutableGameStateResponse;
 import com.chabomakers.nico.controllers.User;
 import com.chabomakers.nico.database.AuctionAction.ActionType;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Collection;
@@ -26,17 +27,19 @@ public class MemoryDatabase {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
 
+  private final Map<UUID, List<PowerPlantCard>> usersCards = Maps.newHashMap();
   private final Map<UUID, UserRow> users = Maps.newHashMap();
   private GamePhase gamePhase = GamePhase.LOBBY;
   private PowerPlantMarket powerPlantMarket = PowerPlantMarket.createFreshDeck();
 
-  // Bidding state machine
+  // Auction + Bidding state
   private int auctionNumber = 0;
   private List<UUID> playerOrder;
   private int currentBidIndex;
   private Set<UUID> currentBidPassedUsers;
-  private PowerPlantCard currentPlant;
-  private int currentBid;
+  private PowerPlantCard currentBidPlant;
+  private int currentPowerPlantBid;
+  private UUID highestBidUser;
 
   @Inject
   public MemoryDatabase() {}
@@ -49,19 +52,22 @@ public class MemoryDatabase {
     ImmutableUserRow newUser =
         ImmutableUserRow.builder().color(color).id(UUID.randomUUID()).name(username).build();
     users.put(newUser.id(), newUser);
+    usersCards.put(newUser.id(), Lists.newArrayList());
     return newUser;
   }
 
   public void performAuctionAction(AuctionAction action) {
     if (gamePhase == GamePhase.AUCTION_POWERPLANT) {
       if (action.actionType() == CHOOSE_PLANT) {
-        if (currentPlant != null) {
+        if (currentBidPlant != null) {
           throw new BadRequestException("Choosing a plant when a plant is already chosen.");
         }
         if (action.bid() == null) {
           throw new BadRequestException("Bid value cannot be null when submitting a bid.");
         }
-        currentBid = action.bid();
+        currentPowerPlantBid = action.bid();
+        highestBidUser = action.userId();
+        currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
         currentBidIndex = (auctionNumber + 1) % users.size();
         gamePhase = GamePhase.POWERPLANT_BIDDING;
       }
@@ -75,6 +81,9 @@ public class MemoryDatabase {
           if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
             LOGGER.info("All user's but one has passed on the current auction.");
             gamePhase = GamePhase.AUCTION_POWERPLANT;
+            powerPlantMarket.removeCard(currentBidPlant);
+            usersCards.get(highestBidUser).add(currentBidPlant);
+            currentBidPlant = null;
           } else {
             // Let the next user have a shot at bidding.
             do {
@@ -102,6 +111,9 @@ public class MemoryDatabase {
         .currentUser(currentUser)
         .actualMarket(powerPlantMarket.actualMarket())
         .futureMarket(powerPlantMarket.futureMarket())
+        .currentPowerPlantBid(currentPowerPlantBid)
+        .currentBidPowerPlant(currentBidPlant)
+        .userPowerPlants(usersCards)
         .gamePhase(gamePhase())
         .build();
   }
@@ -131,8 +143,8 @@ public class MemoryDatabase {
     currentBidIndex = 0;
     currentBidPassedUsers = Sets.newHashSet();
     gamePhase = GamePhase.AUCTION_POWERPLANT;
-    currentPlant = null;
-    currentBid = 0;
+    currentBidPlant = null;
+    currentPowerPlantBid = 0;
   }
 
   public enum GamePhase {

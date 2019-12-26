@@ -6,6 +6,8 @@ import com.chabomakers.nico.database.ImmutableAuctionAction;
 import com.chabomakers.nico.database.MemoryDatabase;
 import com.chabomakers.nico.database.MemoryDatabase.GamePhase;
 import com.chabomakers.nico.database.PowerPlantCard;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
@@ -23,7 +25,7 @@ public class MemoryDatabaseIntegrationTest {
   }
 
   @Test
-  void createUsers() {
+  void auction_bothUsersPass() {
     memoryDatabase.createUser("user1", "red");
     memoryDatabase.createUser("user2", "blue");
     memoryDatabase.createUser("user3", "green");
@@ -77,5 +79,7 @@ public class MemoryDatabaseIntegrationTest {
     // Since both users passed, we are now onto the phase where the second user gets to
     // choose a plant to begin bidding on.
     Assertions.assertEquals(memoryDatabase.gamePhase(), GamePhase.AUCTION_POWERPLANT);
+    Map<UUID, List<PowerPlantCard>> userPowerPlants = memoryDatabase.gameState().userPowerPlants();
+    Assertions.assertEquals(userPowerPlants.get(player1Id).size(), 1);
   }
 }
