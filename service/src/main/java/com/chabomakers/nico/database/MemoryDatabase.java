@@ -38,7 +38,7 @@ public class MemoryDatabase {
   private int currentBidIndex;
   private Set<UUID> currentBidPassedUsers;
   private PowerPlantCard currentBidPlant;
-  private int currentPowerPlantBid;
+  private Integer currentPowerPlantBid;
   private UUID highestBidUser;
 
   @Inject
@@ -76,7 +76,15 @@ public class MemoryDatabase {
     if (gamePhase == GamePhase.POWERPLANT_BIDDING) {
       UUID currentUser = currentBidUser();
       if (action.userId().equals(currentUser)) {
-        if (action.actionType() == ActionType.PASS) {
+        if (action.actionType() == ActionType.BID) {
+          Integer bidValue = action.bid();
+          if (bidValue == null || bidValue <= currentPowerPlantBid) {
+            throw new BadRequestException("Invalid bid value.");
+          }
+          currentPowerPlantBid = bidValue;
+          highestBidUser = currentUser;
+          selectNextBidUser();
+        } else if (action.actionType() == ActionType.PASS) {
           currentBidPassedUsers.add(currentUser);
           if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
             LOGGER.info("All user's but one has passed on the current auction.");
@@ -84,17 +92,23 @@ public class MemoryDatabase {
             powerPlantMarket.removeCard(currentBidPlant);
             usersCards.get(highestBidUser).add(currentBidPlant);
             currentBidPlant = null;
+            currentPowerPlantBid = null;
+            highestBidUser = null;
           } else {
             // Let the next user have a shot at bidding.
-            do {
-              currentBidIndex = (currentBidIndex + 1) % users.size();
-            } while (currentBidPassedUsers.contains(currentBidUser()));
+            selectNextBidUser();
           }
         }
       }
       return;
     }
     throw new BadRequestException("Not in auction powerplant phase or bid phase.");
+  }
+
+  private void selectNextBidUser() {
+    do {
+      currentBidIndex = (currentBidIndex + 1) % users.size();
+    } while (currentBidPassedUsers.contains(currentBidUser()));
   }
 
   public GamePhase gamePhase() {
@@ -114,6 +128,7 @@ public class MemoryDatabase {
         .currentPowerPlantBid(currentPowerPlantBid)
         .currentBidPowerPlant(currentBidPlant)
         .userPowerPlants(usersCards)
+        .userWithHighestPowerplantBid(highestBidUser)
         .gamePhase(gamePhase())
         .build();
   }

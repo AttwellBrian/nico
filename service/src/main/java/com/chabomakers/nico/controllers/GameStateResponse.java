@@ -33,6 +33,9 @@ public interface GameStateResponse {
   PowerPlantCard currentBidPowerPlant();
 
   @Nullable
+  UUID userWithHighestPowerplantBid();
+
+  @Nullable
   List<PowerPlantCard> actualMarket();
 
   @Nullable
