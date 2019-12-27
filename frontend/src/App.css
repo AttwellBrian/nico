@@ -139,9 +139,6 @@
 }
 
 .marketContainer {
-  width: 400px;
-  height: 400px;
-  background-color: rgba(0, 0, 0, 0.6);
   position: fixed;
   right: 0;
   top: 200px;

@@ -354,6 +354,61 @@ const userProfile = {
   uuid: "PLYR1"
 };
 
+const gameStatePre = {
+  players: {
+    PLYR1: {
+      name: "Lightning Bug, LLC.",
+      color: "blue"
+    },
+    PLYR2: {
+      name: "Oil Barron, Inc.",
+      color: "green"
+    },
+    PLYR3: {
+      name: "Armco, Co.",
+      color: "red"
+    }
+  },
+  playerOrder: ["PLYR2", "PLYR3", "PLYR1"],
+  currentPlayer: "PLYR1",
+  ownedPowerPlants: {
+    PLYR1: ["1", "2", "3"],
+    PLYR2: ["4", "5", "6"],
+    PLYR3: ["7", "8", "9"]
+  },
+  ownedResources: {
+    PLYR1: {
+      money: 40,
+      coal: 5,
+      garbage: 2,
+      uranium: 1,
+      oil: 3
+    },
+    PLYR2: {
+      money: 20,
+      coal: 1,
+      garbage: 0,
+      uranium: 3,
+      oil: 2
+    },
+    PLYR3: {
+      money: 95,
+      coal: 5,
+      garbage: 1,
+      uranium: 5,
+      oil: 10
+    }
+  },
+  ownedCities: {
+    PLYR1: ["seattle"],
+    PLYR2: ["boise"],
+    PLYR3: ["billings"]
+  },
+  actualMarket: ["10", "11", "12", "13"],
+  futureMarket: ["14", "15", "16", "17"],
+  gamePhase: "auctionPickPlant" // "auctionBidding",
+};
+
 const gameState = {
   players: {
     PLYR1: {
@@ -405,7 +460,10 @@ const gameState = {
     PLYR3: ["billings"]
   },
   actualMarket: ["10", "11", "12", "13"],
-  futureMarket: ["14", "15", "16", "17"]
+  futureMarket: ["14", "15", "16", "17"],
+  gamePhase: "auctionBidding", // "auctionPickPlant", "auctionBidding",
+  currentBid: 0,
+  highestBidder: "PLYR3"
 };
 
-export { map, userProfile, gameState, powerPlants };
+export { map, userProfile, gameState, gameStatePre, powerPlants };

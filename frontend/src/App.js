@@ -1,9 +1,17 @@
 import React from "react";
 import "./App.css";
 import mainMapImage from "./assets/images/usmap-background.jpg";
-import { map, userProfile, gameState, powerPlants } from "./fakeData";
+import {
+  map,
+  userProfile,
+  gameState,
+  gameStatePre,
+  powerPlants
+} from "./fakeData";
 import City from "./components/City";
+import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
+import { Button } from "reactstrap";
 import * as tools from "./functions";
 
 class App extends React.Component {
@@ -13,7 +21,7 @@ class App extends React.Component {
       userProfile: {
         name: "",
         color: "",
-        uuid: "" // uuidABC
+        uuid: "PLYR1" // uuidABC
       },
       gameState: {
         players: {
@@ -75,20 +83,65 @@ class App extends React.Component {
           "plantUUID",
           "plantUUID",
           */
-        ]
+        ],
+        gamePhase: "",
+        currentBid: 0
       },
-      powerPlants: {}
+      powerPlants: {},
+      showPowerPlantMarket: false,
+      highestBidder: ""
     };
+    this.toggleShowPowerPlantModal = this.toggleShowPowerPlantModal.bind(this);
+  }
+
+  toggleShowPowerPlantModal() {
+    this.setState(prevState => ({
+      showPowerPlantMarket: !prevState.showPowerPlantMarket
+    }));
   }
 
   componentDidUpdate() {}
 
   componentDidMount() {
-    this.setState({
-      userProfile: userProfile,
-      gameState: gameState,
-      powerPlants: powerPlants
-    });
+    // first ping the API for the first initial state
+    // FAKE API RETURN HERE (actually, we imported it from fakeData.js)
+    // then set initial state so there's a state
+    let self = this;
+    this.setState(
+      {
+        userProfile: userProfile,
+        gameState: gameStatePre,
+        powerPlants: powerPlants
+      },
+      () => {
+        // after first state is set, setInterval to ping gameState API every 100ms
+        this.interval = setInterval(function() {
+          // ping API every 100ms
+          // FAKE API RETURN HERE (actually we imported it from fakeData.js)
+
+          // Now run all the callback checks
+          // Check to see if it is the first time we are entering auctionPickPlant so we can pop the modal up
+          if (
+            self.state.gameState.gamePhase !== "auctionPickPlant" &&
+            gameState.gamePhase === "auctionPickPlant" &&
+            self.state.showPowerPlantMarket === false
+          ) {
+            self.setState({
+              showPowerPlantMarket: true
+            });
+          }
+
+          // Finally, update the gameState
+          self.setState({
+            gameState: gameState
+          });
+        }, 100);
+      }
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render() {
@@ -165,7 +218,10 @@ class App extends React.Component {
         </div>
 
         <div className="marketContainer">
-          <div className="containerTitle">Powerplant Market</div>
+          <PowerPlantMarket
+            state={this.state}
+            parentToggle={this.toggleShowPowerPlantModal}
+          />
         </div>
         <div className="playersContainer">
           <div className="containerTitle">The Competition</div>
