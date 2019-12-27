@@ -37,7 +37,7 @@ public class GameStateIntegrationTest {
 
     gameState.startGame();
     gameStateResponse = gameState.gameState();
-    Assertions.assertEquals(gameStateResponse.gamePhase(), GamePhase.AUCTION_POWERPLANT);
+    Assertions.assertEquals(gameStateResponse.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
     Assertions.assertEquals(gameStateResponse.currentPlayerOrder().size(), 3);
 
     UUID player1Id = gameStateResponse.currentPlayerOrder().get(0);
@@ -65,7 +65,7 @@ public class GameStateIntegrationTest {
             .contains(2));
 
     gameState.performAuctionAction(auctionAction);
-    Assertions.assertEquals(gameState.gamePhase(), GamePhase.POWERPLANT_BIDDING);
+    Assertions.assertEquals(gameState.gamePhase(), GamePhase.AUCTION_BIDDING);
     Assertions.assertEquals(gameState.gameState().currentUser(), player2Id);
     Assertions.assertEquals(gameState.gameState().userWithHighestPowerplantBid(), player1Id);
     Truth.assertThat(gameState.gameState().usersPassedFromBidding()).containsExactly();
@@ -83,7 +83,7 @@ public class GameStateIntegrationTest {
 
     // Since both users passed, we are now onto the phase where the second user gets to
     // choose a plant to begin bidding on.
-    Assertions.assertEquals(gameState.gamePhase(), GamePhase.AUCTION_POWERPLANT);
+    Assertions.assertEquals(gameState.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
     Map<UUID, List<PowerPlantCard>> userPowerPlants = gameState.gameState().userPowerPlants();
     Assertions.assertEquals(userPowerPlants.get(player1Id).size(), 1);
   }
@@ -100,7 +100,7 @@ public class GameStateIntegrationTest {
 
     gameState.startGame();
     gameStateResponse = gameState.gameState();
-    Assertions.assertEquals(gameStateResponse.gamePhase(), GamePhase.AUCTION_POWERPLANT);
+    Assertions.assertEquals(gameStateResponse.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
     Assertions.assertEquals(gameStateResponse.currentPlayerOrder().size(), 3);
 
     UUID player1Id = gameStateResponse.currentPlayerOrder().get(0);
@@ -128,7 +128,7 @@ public class GameStateIntegrationTest {
             .contains(2));
 
     gameState.performAuctionAction(auctionAction);
-    Assertions.assertEquals(gameState.gamePhase(), GamePhase.POWERPLANT_BIDDING);
+    Assertions.assertEquals(gameState.gamePhase(), GamePhase.AUCTION_BIDDING);
     Assertions.assertEquals(gameState.gameState().currentUser(), player2Id);
     Assertions.assertEquals(player1Id, gameState.gameState().userWithHighestPowerplantBid());
 
@@ -165,7 +165,7 @@ public class GameStateIntegrationTest {
     Assertions.assertNull(gameState.gameState().userWithHighestPowerplantBid());
 
     // Since the first user passsed on their second round of bidding, user two wins the auction.
-    Assertions.assertEquals(gameState.gamePhase(), GamePhase.AUCTION_POWERPLANT);
+    Assertions.assertEquals(gameState.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
     Map<UUID, List<PowerPlantCard>> userPowerPlants = gameState.gameState().userPowerPlants();
     Assertions.assertEquals(userPowerPlants.get(player2Id).size(), 1);
   }

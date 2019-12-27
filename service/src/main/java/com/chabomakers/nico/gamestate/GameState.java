@@ -57,7 +57,7 @@ public class GameState {
   }
 
   public void performAuctionAction(AuctionAction action) {
-    if (gamePhase == GamePhase.AUCTION_POWERPLANT) {
+    if (gamePhase == GamePhase.AUCTION_PICK_PLANT) {
       if (action.actionType() == CHOOSE_PLANT) {
         if (currentBidPlant != null) {
           throw new BadRequestException("Choosing a plant when a plant is already chosen.");
@@ -69,11 +69,11 @@ public class GameState {
         highestBidUser = action.userId();
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
         currentBidIndex = (auctionNumber + 1) % users.size();
-        gamePhase = GamePhase.POWERPLANT_BIDDING;
+        gamePhase = GamePhase.AUCTION_BIDDING;
       }
       return;
     }
-    if (gamePhase == GamePhase.POWERPLANT_BIDDING) {
+    if (gamePhase == GamePhase.AUCTION_BIDDING) {
       UUID currentUser = currentBidUser();
       if (action.userId().equals(currentUser)) {
         if (action.actionType() == ActionType.BID) {
@@ -88,7 +88,7 @@ public class GameState {
           currentBidPassedUsers.add(currentUser);
           if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
             LOGGER.info("All user's but one has passed on the current auction.");
-            gamePhase = GamePhase.AUCTION_POWERPLANT;
+            gamePhase = GamePhase.AUCTION_PICK_PLANT;
             powerPlantMarket.removeCard(currentBidPlant);
             usersCards.get(highestBidUser).add(currentBidPlant);
             currentBidPlant = null;
@@ -159,15 +159,15 @@ public class GameState {
   private void initializeAuctionPhase() {
     currentBidIndex = 0;
     currentBidPassedUsers = Sets.newHashSet();
-    gamePhase = GamePhase.AUCTION_POWERPLANT;
+    gamePhase = GamePhase.AUCTION_PICK_PLANT;
     currentBidPlant = null;
     currentPowerPlantBid = 0;
   }
 
   public enum GamePhase {
     LOBBY,
-    AUCTION_POWERPLANT,
-    POWERPLANT_BIDDING,
+    AUCTION_PICK_PLANT,
+    AUCTION_BIDDING,
     BUYING_RESOURCES
   }
 }

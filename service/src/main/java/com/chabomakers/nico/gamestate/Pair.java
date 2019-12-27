@@ -1,5 +1,6 @@
 package com.chabomakers.nico.gamestate;
 
+/** Standard pair class. Didn't use the Guava libraries implementation because i was on a plane. */
 public class Pair<K, V> {
 
   public final K key;
