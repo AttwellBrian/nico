@@ -1,6 +1,6 @@
 package com.chabomakers.nico.controllers;
 
-import com.chabomakers.nico.gamestate.GameState.GamePhase;
+import com.chabomakers.nico.gamestate.GameStateMachine.GamePhase;
 import com.chabomakers.nico.gamestate.PowerPlantCard;
 import java.util.List;
 import java.util.Map;

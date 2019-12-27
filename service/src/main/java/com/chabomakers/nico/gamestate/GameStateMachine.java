@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class GameState {
+public class GameStateMachine {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(GameState.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GameStateMachine.class);
 
   private final Map<UUID, List<PowerPlantCard>> usersCards = Maps.newHashMap();
   private final Map<UUID, UserRow> users = Maps.newHashMap();
@@ -42,7 +42,7 @@ public class GameState {
   private UUID highestBidUser;
 
   @Inject
-  public GameState() {}
+  public GameStateMachine() {}
 
   public Collection<UserRow> getUsers() {
     return users.values();
