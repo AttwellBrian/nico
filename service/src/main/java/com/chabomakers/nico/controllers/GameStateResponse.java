@@ -4,6 +4,7 @@ import com.chabomakers.nico.database.MemoryDatabase.GamePhase;
 import com.chabomakers.nico.database.PowerPlantCard;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import javax.annotation.Nullable;
 import org.immutables.gson.Gson;
@@ -34,6 +35,10 @@ public interface GameStateResponse {
 
   @Nullable
   UUID userWithHighestPowerplantBid();
+
+  /** Which players have passed in the current round of bidding. */
+  @Nullable
+  Set<UUID> usersPassedFromBidding();
 
   @Nullable
   List<PowerPlantCard> actualMarket();

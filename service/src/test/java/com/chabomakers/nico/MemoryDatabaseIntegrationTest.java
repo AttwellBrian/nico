@@ -6,6 +6,7 @@ import com.chabomakers.nico.database.ImmutableAuctionAction;
 import com.chabomakers.nico.database.MemoryDatabase;
 import com.chabomakers.nico.database.MemoryDatabase.GamePhase;
 import com.chabomakers.nico.database.PowerPlantCard;
+import com.google.common.truth.Truth;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -67,12 +68,15 @@ public class MemoryDatabaseIntegrationTest {
     Assertions.assertEquals(memoryDatabase.gamePhase(), GamePhase.POWERPLANT_BIDDING);
     Assertions.assertEquals(memoryDatabase.gameState().currentUser(), player2Id);
     Assertions.assertEquals(memoryDatabase.gameState().userWithHighestPowerplantBid(), player1Id);
+    Truth.assertThat(memoryDatabase.gameState().usersPassedFromBidding()).containsExactly();
 
     auctionAction =
         ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player2Id).build();
     memoryDatabase.performAuctionAction(auctionAction);
     Assertions.assertEquals(memoryDatabase.gameState().currentUser(), player3Id);
     Assertions.assertEquals(player1Id, memoryDatabase.gameState().userWithHighestPowerplantBid());
+    Truth.assertThat(memoryDatabase.gameState().usersPassedFromBidding())
+        .containsExactly(player2Id);
 
     auctionAction =
         ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player3Id).build();
@@ -143,6 +147,7 @@ public class MemoryDatabaseIntegrationTest {
     Assertions.assertEquals(memoryDatabase.gameState().currentUser(), player3Id);
     Assertions.assertEquals(memoryDatabase.gameState().currentPowerPlantBid(), 6);
     Assertions.assertEquals(player2Id, memoryDatabase.gameState().userWithHighestPowerplantBid());
+    Truth.assertThat(memoryDatabase.gameState().usersPassedFromBidding()).containsExactly();
 
     //
     // THIRD AND FIRST USER PASS ON THE BID
@@ -153,6 +158,8 @@ public class MemoryDatabaseIntegrationTest {
     memoryDatabase.performAuctionAction(auctionAction);
     Assertions.assertEquals(memoryDatabase.gameState().currentUser(), player1Id);
     Assertions.assertEquals(player2Id, memoryDatabase.gameState().userWithHighestPowerplantBid());
+    Truth.assertThat(memoryDatabase.gameState().usersPassedFromBidding())
+        .containsExactly(player3Id);
 
     auctionAction =
         ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player1Id).build();

@@ -118,7 +118,8 @@ public class MemoryDatabase {
   public GameStateResponse gameState() {
     Collection<UserRow> userRows = getUsers();
     final List<User> users = userRows.stream().map(User::toUser).collect(Collectors.toList());
-    UUID currentUser = currentBidUser(); // will need to refine this in a bit.
+    // TODO: will need to refine this in a bit to handle multiple rounds of bidding.
+    UUID currentUser = currentBidUser();
     return ImmutableGameStateResponse.builder()
         .addAllUsers(users)
         .currentPlayerOrder(playerOrder)
@@ -129,6 +130,7 @@ public class MemoryDatabase {
         .currentBidPowerPlant(currentBidPlant)
         .userPowerPlants(usersCards)
         .userWithHighestPowerplantBid(highestBidUser)
+        .usersPassedFromBidding(currentBidPassedUsers)
         .gamePhase(gamePhase())
         .build();
   }
