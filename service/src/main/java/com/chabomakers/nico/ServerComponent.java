@@ -1,6 +1,6 @@
 package com.chabomakers.nico;
 
-import com.chabomakers.nico.database.MemoryDatabase;
+import com.chabomakers.nico.gamestate.GameState;
 import dagger.Component;
 import javax.inject.Singleton;
 
@@ -9,5 +9,5 @@ import javax.inject.Singleton;
 interface ServerComponent {
   Server server();
 
-  MemoryDatabase memoryDatabase();
+  GameState memoryDatabase();
 }

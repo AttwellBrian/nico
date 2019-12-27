@@ -1,6 +1,6 @@
 package com.chabomakers.nico.controllers;
 
-import com.chabomakers.nico.database.UserRow;
+import com.chabomakers.nico.gamestate.UserRow;
 import java.util.UUID;
 import org.immutables.gson.Gson;
 import org.immutables.value.Generated;

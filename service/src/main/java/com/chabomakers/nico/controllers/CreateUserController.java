@@ -1,19 +1,19 @@
 package com.chabomakers.nico.controllers;
 
 import com.chabomakers.nico.Controller;
-import com.chabomakers.nico.database.MemoryDatabase;
-import com.chabomakers.nico.database.UserRow;
+import com.chabomakers.nico.gamestate.GameState;
+import com.chabomakers.nico.gamestate.UserRow;
 import javax.inject.Inject;
 import spark.Request;
 import spark.Response;
 
 public class CreateUserController implements Controller {
 
-  private MemoryDatabase memoryDatabase;
+  private GameState gameState;
 
   @Inject
-  public CreateUserController(MemoryDatabase realDatabase) {
-    this.memoryDatabase = realDatabase;
+  public CreateUserController(GameState realDatabase) {
+    this.gameState = realDatabase;
   }
 
   @Override
@@ -25,7 +25,7 @@ public class CreateUserController implements Controller {
   public CreateUserResponse post(Request request, Response response) {
     String name = request.queryParams("name");
     String color = request.queryParams("color");
-    UserRow user = memoryDatabase.createUser(name, color);
+    UserRow user = gameState.createUser(name, color);
     return ImmutableCreateUserResponse.builder().user(user).build();
   }
 }

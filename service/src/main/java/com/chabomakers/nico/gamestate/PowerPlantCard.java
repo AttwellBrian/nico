@@ -1,4 +1,4 @@
-package com.chabomakers.nico.database;
+package com.chabomakers.nico.gamestate;
 
 import javax.annotation.Generated;
 import org.immutables.gson.Gson;

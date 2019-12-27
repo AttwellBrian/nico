@@ -1,12 +1,12 @@
-package com.chabomakers.nico.database;
+package com.chabomakers.nico.gamestate;
 
-import static com.chabomakers.nico.database.AuctionAction.ActionType.CHOOSE_PLANT;
+import static com.chabomakers.nico.gamestate.AuctionAction.ActionType.CHOOSE_PLANT;
 
 import com.chabomakers.nico.BadRequestException;
 import com.chabomakers.nico.controllers.GameStateResponse;
 import com.chabomakers.nico.controllers.ImmutableGameStateResponse;
 import com.chabomakers.nico.controllers.User;
-import com.chabomakers.nico.database.AuctionAction.ActionType;
+import com.chabomakers.nico.gamestate.AuctionAction.ActionType;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -23,9 +23,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-public class MemoryDatabase {
+public class GameState {
 
-  private static final Logger LOGGER = LoggerFactory.getLogger(MemoryDatabase.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GameState.class);
 
   private final Map<UUID, List<PowerPlantCard>> usersCards = Maps.newHashMap();
   private final Map<UUID, UserRow> users = Maps.newHashMap();
@@ -42,7 +42,7 @@ public class MemoryDatabase {
   private UUID highestBidUser;
 
   @Inject
-  public MemoryDatabase() {}
+  public GameState() {}
 
   public Collection<UserRow> getUsers() {
     return users.values();

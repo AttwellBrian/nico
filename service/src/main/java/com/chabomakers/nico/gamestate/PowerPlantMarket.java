@@ -1,6 +1,6 @@
-package com.chabomakers.nico.database;
+package com.chabomakers.nico.gamestate;
 
-import com.chabomakers.nico.database.PowerPlantCard.ResourceType;
+import com.chabomakers.nico.gamestate.PowerPlantCard.ResourceType;
 import com.google.common.collect.Sets;
 import java.util.Comparator;
 import java.util.List;
