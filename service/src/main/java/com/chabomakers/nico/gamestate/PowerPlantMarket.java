@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -16,54 +17,63 @@ public class PowerPlantMarket {
     Set<PowerPlantCard> cards =
         Sets.newHashSet(
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(1)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(2)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(3)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(4)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(5)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(6)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(7)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(8)
                 .resourcesRequired(2)
                 .resourceType(ResourceType.COAL)
                 .build(),
             ImmutablePowerPlantCard.builder()
+                .id(UUID.randomUUID())
                 .homesPowered(1)
                 .minimumAcceptableBid(9)
                 .resourcesRequired(2)
@@ -88,12 +98,8 @@ public class PowerPlantMarket {
     cards.remove(currentPlant);
   }
 
-  public PowerPlantCard getCard(Integer choosePlantId) {
-    return cards
-        .stream()
-        .filter(card -> card.minimumAcceptableBid() == choosePlantId)
-        .findFirst()
-        .get();
+  public PowerPlantCard getCard(UUID choosePlantId) {
+    return cards.stream().filter(card -> card.id().equals(choosePlantId)).findFirst().get();
   }
 
   private Stream<PowerPlantCard> sortedStream() {

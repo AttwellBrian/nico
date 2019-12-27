@@ -1,5 +1,6 @@
 package com.chabomakers.nico;
 
+import com.chabomakers.nico.controllers.AuctionActionController;
 import com.chabomakers.nico.controllers.CreateUserController;
 import com.chabomakers.nico.controllers.GameStateController;
 import com.chabomakers.nico.controllers.StartGameController;
@@ -39,6 +40,10 @@ abstract class ServerModule {
   @Binds
   @IntoSet
   abstract Controller createUserController(CreateUserController controller);
+
+  @Binds
+  @IntoSet
+  abstract Controller auctionBidController(AuctionActionController controller);
 
   @Provides
   static Set<Interceptor> interceptorList() {
