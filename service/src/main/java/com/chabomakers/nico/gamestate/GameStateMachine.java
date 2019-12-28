@@ -1,6 +1,7 @@
 package com.chabomakers.nico.gamestate;
 
 import static com.chabomakers.nico.gamestate.AuctionAction.ActionType.CHOOSE_PLANT;
+import static com.chabomakers.nico.gamestate.GameStateMachine.GamePhase.*;
 
 import com.chabomakers.nico.BadRequestException;
 import com.chabomakers.nico.controllers.GameStateResponse;
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ public class GameStateMachine {
 
   private final Map<UUID, List<PowerPlantCard>> usersCards = Maps.newHashMap();
   private final Map<UUID, UserRow> users = Maps.newHashMap();
-  private GamePhase gamePhase = GamePhase.LOBBY;
+  private GamePhase gamePhase = LOBBY;
   private PowerPlantMarket powerPlantMarket = PowerPlantMarket.createFreshDeck();
 
   // Auction + Bidding state
@@ -57,7 +59,7 @@ public class GameStateMachine {
   }
 
   public void performAuctionAction(AuctionAction action) {
-    if (gamePhase == GamePhase.AUCTION_PICK_PLANT) {
+    if (gamePhase == AUCTION_PICK_PLANT) {
       if (action.actionType() == CHOOSE_PLANT) {
         if (currentBidPlant != null) {
           throw new BadRequestException("Choosing a plant when a plant is already chosen.");
@@ -69,13 +71,13 @@ public class GameStateMachine {
         highestBidUser = action.userId();
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
         currentBidIndex = (auctionNumber + 1) % users.size();
-        gamePhase = GamePhase.AUCTION_BIDDING;
+        gamePhase = AUCTION_BIDDING;
       } else {
         // TODO: need to implement this logic.
       }
       return;
     }
-    if (gamePhase == GamePhase.AUCTION_BIDDING) {
+    if (gamePhase == AUCTION_BIDDING) {
       UUID currentUser = currentBidUser();
       if (action.userId().equals(currentUser)) {
         if (action.actionType() == ActionType.BID) {
@@ -90,11 +92,12 @@ public class GameStateMachine {
           currentBidPassedUsers.add(currentUser);
           if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
             LOGGER.info("All user's but one has passed on the current auction.");
-            gamePhase = GamePhase.AUCTION_PICK_PLANT;
+            gamePhase = AUCTION_PICK_PLANT;
             powerPlantMarket.removeCard(currentBidPlant);
             usersCards.get(highestBidUser).add(currentBidPlant);
             currentBidPlant = null;
             currentPowerPlantBid = null;
+            auctionNumber = auctionNumber + 1;
             highestBidUser = null;
           } else {
             // Let the next user have a shot at bidding.
@@ -120,12 +123,10 @@ public class GameStateMachine {
   public GameStateResponse gameState() {
     Collection<UserRow> userRows = getUsers();
     final List<User> users = userRows.stream().map(User::toUser).collect(Collectors.toList());
-    // TODO: will need to refine this in a bit to handle multiple rounds of bidding.
-    UUID currentUser = currentBidUser();
     return ImmutableGameStateResponse.builder()
         .addAllUsers(users)
         .currentPlayerOrder(playerOrder)
-        .currentUser(currentUser)
+        .currentUser(currentUser())
         .actualMarket(powerPlantMarket.actualMarket())
         .futureMarket(powerPlantMarket.futureMarket())
         .currentPowerPlantBid(currentPowerPlantBid)
@@ -140,6 +141,22 @@ public class GameStateMachine {
   public void startGame() {
     assignUserOrder();
     initializeAuctionPhase();
+  }
+
+  @Nullable
+  private UUID currentUser() {
+    switch (gamePhase) {
+      case AUCTION_PICK_PLANT:
+        return currentPlantPickerUser();
+      case AUCTION_BIDDING:
+        return currentBidUser();
+      default:
+        return null;
+    }
+  }
+
+  private UUID currentPlantPickerUser() {
+    return playerOrder.get(auctionNumber);
   }
 
   private UUID currentBidUser() {
@@ -161,7 +178,7 @@ public class GameStateMachine {
   private void initializeAuctionPhase() {
     currentBidIndex = 0;
     currentBidPassedUsers = Sets.newHashSet();
-    gamePhase = GamePhase.AUCTION_PICK_PLANT;
+    gamePhase = AUCTION_PICK_PLANT;
     currentBidPlant = null;
     currentPowerPlantBid = 0;
   }

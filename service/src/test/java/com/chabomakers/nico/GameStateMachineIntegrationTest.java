@@ -86,6 +86,7 @@ public class GameStateMachineIntegrationTest {
     // Since both users passed, we are now onto the phase where the second user gets to
     // choose a plant to begin bidding on.
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
+    Assertions.assertEquals(player2Id, gameStateMachine.gameState().currentUser());
     Map<UUID, List<PowerPlantCard>> userPowerPlants =
         gameStateMachine.gameState().userPowerPlants();
     Assertions.assertEquals(userPowerPlants.get(player1Id).size(), 1);
