@@ -42,6 +42,7 @@ public class GameStateMachine {
   private PowerPlantCard currentBidPlant;
   private Integer currentPowerPlantBid;
   private UUID highestBidUser;
+  private Set<UUID> playersWhoHaveWonAuctions = Sets.newHashSet();
 
   @Inject
   public GameStateMachine() {}
@@ -95,6 +96,7 @@ public class GameStateMachine {
             gamePhase = AUCTION_PICK_PLANT;
             powerPlantMarket.removeCard(currentBidPlant);
             usersCards.get(highestBidUser).add(currentBidPlant);
+            playersWhoHaveWonAuctions.add(highestBidUser);
             currentBidPlant = null;
             currentPowerPlantBid = null;
             auctionNumber = auctionNumber + 1;
@@ -113,7 +115,8 @@ public class GameStateMachine {
   private void selectNextBidUser() {
     do {
       currentBidIndex = (currentBidIndex + 1) % users.size();
-    } while (currentBidPassedUsers.contains(currentBidUser()));
+    } while (currentBidPassedUsers.contains(currentBidUser())
+        || playersWhoHaveWonAuctions.contains(currentBidUser()));
   }
 
   public GamePhase gamePhase() {
@@ -176,6 +179,7 @@ public class GameStateMachine {
   }
 
   private void initializeAuctionPhase() {
+    playersWhoHaveWonAuctions = Sets.newHashSet();
     currentBidIndex = 0;
     currentBidPassedUsers = Sets.newHashSet();
     gamePhase = AUCTION_PICK_PLANT;
