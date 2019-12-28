@@ -1,4 +1,4 @@
-package com.chabomakers.nico.database;
+package com.chabomakers.nico.gamestate;
 
 import java.util.UUID;
 import javax.annotation.Generated;

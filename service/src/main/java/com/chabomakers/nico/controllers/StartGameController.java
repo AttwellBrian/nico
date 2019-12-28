@@ -1,18 +1,18 @@
 package com.chabomakers.nico.controllers;
 
 import com.chabomakers.nico.Controller;
-import com.chabomakers.nico.database.MemoryDatabase;
+import com.chabomakers.nico.gamestate.GameStateMachine;
 import javax.inject.Inject;
 import spark.Request;
 import spark.Response;
 
 public class StartGameController implements Controller {
 
-  private MemoryDatabase memoryDatabase;
+  private GameStateMachine gameStateMachine;
 
   @Inject
-  public StartGameController(MemoryDatabase memoryDatabase) {
-    this.memoryDatabase = memoryDatabase;
+  public StartGameController(GameStateMachine gameStateMachine) {
+    this.gameStateMachine = gameStateMachine;
   }
 
   @Override
@@ -22,7 +22,7 @@ public class StartGameController implements Controller {
 
   @Override
   public GameStateResponse post(Request request, Response response) {
-    memoryDatabase.startGame();
-    return GameStateController.getGameStateResponse(memoryDatabase);
+    gameStateMachine.startGame();
+    return gameStateMachine.gameState();
   }
 }

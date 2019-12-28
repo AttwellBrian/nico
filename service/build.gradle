@@ -2,6 +2,7 @@ plugins {
   id "application"
   id "jacoco"
   id "java"
+  id "idea"
   id "com.github.sherter.google-java-format" version "0.8"
   id "com.bmuschko.docker-java-application" version "4.8.0"
 }
@@ -42,6 +43,7 @@ dependencies {
   implementation "org.jdbi:jdbi3-sqlobject:${versions.jdbi}"
   implementation  "org.jdbi:jdbi3-guava:${versions.jdbi}"
 
+  testImplementation "com.google.truth:truth:1.0"
   testImplementation "org.mockito:mockito-core:2.27.0"
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.4.2"
   testImplementation "org.junit.jupiter:junit-jupiter-params:5.4.2"

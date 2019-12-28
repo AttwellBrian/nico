@@ -1,5 +1,6 @@
 package com.chabomakers.nico;
 
+import com.chabomakers.nico.gamestate.GameStateMachine;
 import dagger.Component;
 import javax.inject.Singleton;
 
@@ -7,4 +8,6 @@ import javax.inject.Singleton;
 @Component(modules = {ServerModule.class})
 interface ServerComponent {
   Server server();
+
+  GameStateMachine memoryDatabase();
 }
