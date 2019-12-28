@@ -70,6 +70,8 @@ public class GameStateMachine {
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
         currentBidIndex = (auctionNumber + 1) % users.size();
         gamePhase = GamePhase.AUCTION_BIDDING;
+      } else {
+        // TODO: need to implement this logic.
       }
       return;
     }

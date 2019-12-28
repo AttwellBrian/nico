@@ -14,12 +14,13 @@ public interface AuctionAction {
 
   ActionType actionType();
 
+  /** When bidding, or choosing a plant you must pass in a bid. */
   @Nullable
   Integer bid();
 
   /** When choosing a plant, you must pass in the ID of the power plant. */
   @Nullable
-  Integer choosePlantId();
+  UUID choosePlantId();
 
   enum ActionType {
     PASS,
