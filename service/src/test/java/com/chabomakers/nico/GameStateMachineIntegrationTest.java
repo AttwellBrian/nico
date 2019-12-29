@@ -26,7 +26,7 @@ public class GameStateMachineIntegrationTest {
   }
 
   @Test
-  void auction_bothUsersPass() {
+  void auction_usersPassOnBids() {
     gameStateMachine.createUser("user1", "red");
     gameStateMachine.createUser("user2", "blue");
     gameStateMachine.createUser("user3", "green");
@@ -86,9 +86,57 @@ public class GameStateMachineIntegrationTest {
     // Since both users passed, we are now onto the phase where the second user gets to
     // choose a plant to begin bidding on.
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
+    Assertions.assertEquals(player2Id, gameStateMachine.gameState().currentUser());
     Map<UUID, List<PowerPlantCard>> userPowerPlants =
         gameStateMachine.gameState().userPowerPlants();
     Assertions.assertEquals(userPowerPlants.get(player1Id).size(), 1);
+
+    //
+    // SECOND USER INITIATES BIDDING ON A PLANT, OTHER USER PASSES
+    //
+
+    PowerPlantCard secondPowerPlant = gameStateMachine.gameState().actualMarket().get(2);
+    UUID secondPlantId = secondPowerPlant.id();
+    auctionAction =
+        ImmutableAuctionAction.builder()
+            .actionType(ActionType.CHOOSE_PLANT)
+            .choosePlantId(secondPlantId)
+            .userId(player2Id)
+            .bid(12)
+            .build();
+    gameStateMachine.performAuctionAction(auctionAction);
+    Truth.assertThat(gameStateMachine.gameState().currentUser()).isEqualTo(player3Id);
+
+    auctionAction =
+        ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player3Id).build();
+    gameStateMachine.performAuctionAction(auctionAction);
+
+    // Since the first user can't bid on a second plant and the third user passed, the second user
+    // wins the power plant.
+    userPowerPlants = gameStateMachine.gameState().userPowerPlants();
+    Truth.assertThat(gameStateMachine.gameState().currentUser()).isEqualTo(player3Id);
+    Truth.assertThat(gameStateMachine.gameState().gamePhase())
+        .isEqualTo(GamePhase.AUCTION_PICK_PLANT);
+    Truth.assertThat(userPowerPlants.get(player2Id)).containsExactly(secondPowerPlant);
+
+    //
+    // THIRD USER INITIATES AUCTION ON A PLANT AND WINS AUTOMATICALLY
+    //
+    PowerPlantCard auctionedPowerPLant = gameStateMachine.gameState().actualMarket().get(1);
+    auctionAction =
+        ImmutableAuctionAction.builder()
+            .actionType(ActionType.CHOOSE_PLANT)
+            .choosePlantId(auctionedPowerPLant.id())
+            .userId(player3Id)
+            .bid(12)
+            .build();
+    gameStateMachine.performAuctionAction(auctionAction);
+
+    GameStateResponse gameState = gameStateMachine.gameState();
+    Truth.assertThat(gameState.currentUser()).isEqualTo(player3Id);
+    Truth.assertThat(gameState.gamePhase()).isEqualTo(GamePhase.BUYING_RESOURCES);
+    userPowerPlants = gameState.userPowerPlants();
+    Truth.assertThat(userPowerPlants.get(player3Id)).containsExactly(auctionedPowerPLant);
   }
 
   @Test
