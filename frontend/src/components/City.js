@@ -10,9 +10,14 @@ class City extends React.Component {
   }
 
   toggleClick() {
-    this.setState(prevState => ({
-      clicked: !prevState.clicked
-    }));
+    this.setState(
+      prevState => ({
+        clicked: !prevState.clicked
+      }),
+      () => {
+        this.props.addRemoveSelectedCity(this.props.id, this.state.clicked);
+      }
+    );
   }
 
   componentDidUpdate() {}

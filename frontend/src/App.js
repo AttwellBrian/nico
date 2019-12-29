@@ -92,9 +92,12 @@ class App extends React.Component {
       powerPlants: {},
       showGame: false,
       showPowerPlantMarket: false,
-      highestBidder: ""
+      highestBidder: "",
+      selectedCities: [],
+      costToPurchaseCities: 0
     };
     this.toggleShowPowerPlantModal = this.toggleShowPowerPlantModal.bind(this);
+    this.addRemoveSelectedCity = this.addRemoveSelectedCity.bind(this);
   }
 
   toggleShowPowerPlantModal() {
@@ -102,6 +105,20 @@ class App extends React.Component {
       showPowerPlantMarket: !prevState.showPowerPlantMarket
     }));
   }
+
+  addRemoveSelectedCity = (city, addTrue) => {
+    // make a new array of temporarily selected power plants
+    let selectedCities = this.state.selectedCities;
+    if (addTrue === true) {
+      selectedCities.push(city);
+    }
+    if (addTrue === false) {
+      let targetIndex = selectedCities.indexOf(city);
+      selectedCities.splice(targetIndex, 1);
+    }
+
+    console.log(selectedCities);
+  };
 
   componentDidUpdate() {}
 
@@ -176,6 +193,7 @@ class App extends React.Component {
           id={city.id}
           top={city.top}
           left={city.left}
+          addRemoveSelectedCity={this.addRemoveSelectedCity}
         />
       );
     });
