@@ -44,6 +44,9 @@ public class GameStateMachine {
   private UUID highestBidUser;
   private Set<UUID> playersWhoHaveWonAuctions = Sets.newHashSet();
 
+  // Resource buying state
+  private int resourceBuyNumber;
+
   @Inject
   public GameStateMachine() {}
 
@@ -73,8 +76,12 @@ public class GameStateMachine {
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
         currentBidIndex = (auctionNumber + 1) % users.size();
         gamePhase = AUCTION_BIDDING;
+        if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
+          handleAllBiddersDone();
+        }
       } else {
         // TODO: need to implement this logic.
+        //  Requires handling some extra cases since everyone can pass on a power plant now.
       }
       return;
     }
@@ -92,15 +99,7 @@ public class GameStateMachine {
         } else if (action.actionType() == ActionType.PASS) {
           currentBidPassedUsers.add(currentUser);
           if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
-            LOGGER.info("All user's but one has passed on the current auction.");
-            gamePhase = AUCTION_PICK_PLANT;
-            powerPlantMarket.removeCard(currentBidPlant);
-            usersCards.get(highestBidUser).add(currentBidPlant);
-            playersWhoHaveWonAuctions.add(highestBidUser);
-            currentBidPlant = null;
-            currentPowerPlantBid = null;
-            auctionNumber = auctionNumber + 1;
-            highestBidUser = null;
+            handleAllBiddersDone();
           } else {
             // Let the next user have a shot at bidding.
             selectNextBidUser();
@@ -110,6 +109,23 @@ public class GameStateMachine {
       return;
     }
     throw new BadRequestException("Not in auction powerplant phase or bid phase.");
+  }
+
+  /** Handle the transition that occurs when all the current auction's bidders are done. */
+  private void handleAllBiddersDone() {
+    LOGGER.info("All user's but one has passed on the current auction.");
+    gamePhase = AUCTION_PICK_PLANT;
+    powerPlantMarket.removeCard(currentBidPlant);
+    usersCards.get(highestBidUser).add(currentBidPlant);
+    playersWhoHaveWonAuctions.add(highestBidUser);
+    currentBidPlant = null;
+    currentPowerPlantBid = null;
+    auctionNumber = auctionNumber + 1;
+    highestBidUser = null;
+    if (auctionNumber == playerOrder.size()) {
+      gamePhase = BUYING_RESOURCES;
+      resourceBuyNumber = 0;
+    }
   }
 
   private void selectNextBidUser() {
@@ -153,9 +169,15 @@ public class GameStateMachine {
         return currentPlantPickerUser();
       case AUCTION_BIDDING:
         return currentBidUser();
+      case BUYING_RESOURCES:
+        return currentResourceBuyUser();
       default:
         return null;
     }
+  }
+
+  private UUID currentResourceBuyUser() {
+    return playerOrder.get(playerOrder.size() - 1 - resourceBuyNumber);
   }
 
   private UUID currentPlantPickerUser() {

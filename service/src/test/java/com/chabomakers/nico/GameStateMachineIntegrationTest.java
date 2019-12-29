@@ -118,6 +118,25 @@ public class GameStateMachineIntegrationTest {
     Truth.assertThat(gameStateMachine.gameState().gamePhase())
         .isEqualTo(GamePhase.AUCTION_PICK_PLANT);
     Truth.assertThat(userPowerPlants.get(player2Id)).containsExactly(secondPowerPlant);
+
+    //
+    // THIRD USER INITIATES AUCTION ON A PLANT AND WINS AUTOMATICALLY
+    //
+    PowerPlantCard auctionedPowerPLant = gameStateMachine.gameState().actualMarket().get(1);
+    auctionAction =
+        ImmutableAuctionAction.builder()
+            .actionType(ActionType.CHOOSE_PLANT)
+            .choosePlantId(auctionedPowerPLant.id())
+            .userId(player3Id)
+            .bid(12)
+            .build();
+    gameStateMachine.performAuctionAction(auctionAction);
+
+    GameStateResponse gameState = gameStateMachine.gameState();
+    Truth.assertThat(gameState.currentUser()).isEqualTo(player3Id);
+    Truth.assertThat(gameState.gamePhase()).isEqualTo(GamePhase.BUYING_RESOURCES);
+    userPowerPlants = gameState.userPowerPlants();
+    Truth.assertThat(userPowerPlants.get(player3Id)).containsExactly(auctionedPowerPLant);
   }
 
   @Test
