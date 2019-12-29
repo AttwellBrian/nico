@@ -1,3 +1,17 @@
+body {
+  font-family: source-sans-pro, sans-serif;
+  font-weight: bold;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: source-sans-pro, sans-serif;
+  font-weight: bold;
+}
 .App {
   text-align: center;
 }
@@ -35,6 +49,186 @@
   to {
     transform: rotate(360deg);
   }
+}
+
+.loginPage {
+  background-color: #000;
+  background-image: url(./assets/images/loginBackground.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  width: 100%;
+  height: 1200px;
+  color: #333;
+  position: absolute;
+  z-index: 9999;
+}
+
+.loginBox {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  float: left;
+  text-align: left;
+  position: absolute;
+  top: 30%;
+  left: 10%;
+  border: solid 5px #ffea00;
+  border-radius: 5px;
+  padding: 50px;
+  font-family: "chaparral-pro";
+  font-weight: 400;
+  font-style: normal;
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff, 0 0 40px #ffea00,
+    0 0 70px #ffea00, 0 0 80px #ffea00, 0 0 100px #ffea00, 0 0 150px #ffea00;
+}
+
+.loginBox .logo {
+  width: 201px;
+  height: 91px;
+  /*background-image: url(./assets/images/logo.png);*/
+  background-size: 100%;
+  margin-bottom: 0px;
+  font-family: "chaparral-pro";
+  font-weight: bold;
+  font-size: 50px;
+}
+
+.inputName {
+  padding: 15px;
+  font-size: 25px;
+  font-family: "chaparral-pro";
+  font-weight: 700;
+  font-style: normal;
+  text-transform: uppercase;
+  background: transparent;
+  border: solid 1px #333;
+  color: #fff;
+  margin-top: 10px;
+  margin-bottom: 15px;
+}
+
+.hide {
+  display: none;
+}
+
+.existingPlayers {
+  font-size: 14px;
+}
+
+.existingPlayer {
+  margin-top: 15px;
+  border: solid 1px #333;
+  float: left;
+  padding: 5px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+}
+
+.existingPlayer:hover {
+  cursor: pointer;
+  border: solid 1px #ffea00;
+  color: #ffea00;
+}
+
+.existingPlayerReset {
+  margin-top: 15px;
+  float: left;
+  padding: 5px;
+  margin-right: 10px;
+  margin-bottom: 20px;
+}
+
+.existingPlayerReset:hover {
+  cursor: pointer;
+  color: #ffea00;
+}
+
+.submitButton {
+  width: 115px;
+  margin-top: 50px;
+}
+
+.submitButtonButton {
+  background: none;
+  color: #fff;
+  font-family: "chaparral-pro";
+  font-weight: 400;
+  font-size: 20px;
+  padding: 5px 10px 5px 10px;
+}
+
+.submitButtonButton:hover {
+  border: solid 3px #ffea00;
+  color: #ffea00;
+  cursor: pointer;
+}
+
+.rocketSelection {
+  width: 100%;
+  float: left;
+}
+
+.rocketSelection input {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  display: inline-block;
+  position: relative;
+  background-color: none;
+  color: #666;
+  height: 50px;
+  width: 50px;
+  border: solid 1px #333;
+  padding: 5px;
+  border-radius: 50px;
+  cursor: pointer;
+  margin-right: 7px;
+  outline: none;
+  float: left;
+}
+
+.rocketSelection .Red input[type="radio"] {
+  content: url(./assets/images/rocket-red.png);
+}
+
+.rocketSelection .Red input[type="radio"]:checked {
+  content: url(./assets/images/rocket-red.png);
+  border: solid 3px #fff;
+}
+
+.rocketSelection .Green input[type="radio"] {
+  content: url(./assets/images/rocket-green.png);
+}
+
+.rocketSelection .Green input[type="radio"]:checked {
+  content: url(./assets/images/rocket-green.png);
+  border: solid 3px #fff;
+}
+
+.rocketSelection .Blue input[type="radio"] {
+  content: url(./assets/images/rocket-blue.png);
+}
+
+.rocketSelection .Blue input[type="radio"]:checked {
+  content: url(./assets/images/rocket-blue.png);
+  border: solid 3px #fff;
+}
+
+.rocketSelection .Yellow input[type="radio"] {
+  content: url(./assets/images/rocket-yellow.png);
+}
+
+.rocketSelection .Yellow input[type="radio"]:checked {
+  content: url(./assets/images/rocket-yellow.png);
+  border: solid 3px #fff;
+}
+
+.rocketSelection .White input[type="radio"] {
+  content: url(./assets/images/rocket-white.png);
+}
+
+.rocketSelection .White input[type="radio"]:checked {
+  content: url(./assets/images/rocket-white.png);
+  border: solid 3px #fff;
 }
 
 .mainMapImage {
@@ -162,4 +356,158 @@
   text-transform: uppercase;
   text-align: left;
   padding: 10px 10px;
+}
+
+.ppContainer {
+  border: solid 1px #333;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.ppContainer .card {
+  border: none;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: top;
+}
+
+.ppContainer .card-body {
+  padding: 0;
+}
+
+.ppTypeOil {
+  background-color: #333333;
+}
+
+.ppTypeOilCard {
+  background-image: url("./assets/images/ppOil.png");
+}
+
+.ppTypeCoal {
+  background-color: #643d00;
+}
+
+.ppTypeCoalCard {
+  background-image: url("./assets/images/ppCoal.png");
+}
+
+.ppTypeHybrid {
+  background: linear-gradient(to bottom, #333333 50%, #643d00 50%);
+}
+
+.ppTypeHybridCard {
+  background-image: url("./assets/images/ppHybrid.png");
+}
+
+.ppTypeUranium {
+  background-color: #9f061b;
+}
+
+.ppTypeUraniumCard {
+  background-image: url("./assets/images/ppUranium.png");
+}
+
+.ppTypeGarbage {
+  background-color: #f3d248;
+}
+
+.ppTypeGarbageCard {
+  background-image: url("./assets/images/ppGarbage.png");
+}
+
+.ppTypeEcological {
+  background-color: #14ac00;
+}
+
+.ppTypeEcologicalCard {
+  background-image: url("./assets/images/ppEcological.png");
+}
+
+.ppCard {
+  border-radius: 5px;
+}
+
+.ppCard .cost {
+  position: absolute;
+  font-size: 50px;
+  font-weight: bolder;
+  text-transform: uppercase;
+  top: -10px;
+  left: -5px;
+  text-shadow: -3px -3px 0 #fff, 0 -3px 0 #fff, 3px -3px 0 #fff, 3px 0 0 #fff,
+    3px 3px 0 #fff, 0 3px 0 #fff, -3px 3px 0 #fff, -3px 0 0 #fff;
+}
+
+.ppCard .bottomBar {
+  margin-top: 100px;
+  height: 50px;
+  position: aboslute;
+  bottom: 0;
+  padding-top: 10px;
+}
+
+.ppCard .bottomBar .col-6 {
+  padding-left: 15px;
+  padding-right: 0;
+}
+
+.ppCard .bottomBar .inputContainer {
+  margin-top: 3px;
+}
+
+.ppCard .bottomBar .inputContainer .input {
+  width: 20px;
+  height: 35px;
+  float: right;
+  margin-right: 3px;
+  background-size: cover;
+}
+
+.ppCard .bottomBar .inputContainer .ppTypeOilInput {
+  background-image: url("./assets/images/resOil.png");
+}
+
+.ppCard .bottomBar .inputContainer .ppTypeCoalInput {
+  background-image: url("./assets/images/resCoal.png");
+}
+
+.ppCard .bottomBar .inputContainer .ppTypeHybridInput {
+  background-image: url("./assets/images/resHybrid.png");
+}
+
+.ppCard .bottomBar .inputContainer .ppTypeGarbageInput {
+  background-image: url("./assets/images/resGarbage.png");
+}
+
+.ppCard .bottomBar .inputContainer .ppTypeUraniumInput {
+  background-image: url("./assets/images/resUranium.png");
+}
+
+.ppCard .bottomBar .inputContainer.ppPowers {
+  width: 14px;
+  height: 25px;
+  float: left;
+  background-size: cover;
+  margin-top: 10px;
+  margin-left: -5px;
+  background-image: url("./assets/images/ppPowers.png");
+}
+
+.ppCard .bottomBar .output {
+  width: 45px;
+  height: 45px;
+  float: left;
+  background-size: cover;
+  margin-top: 0px;
+  margin-left: -30px;
+  background-image: url("./assets/images/ppHouse.png");
+  font-size: 30px;
+  font-weight: bolder;
+  text-shadow: -1px -1px 0 #fff, 0 -1px 0 #fff, 1px -1px 0 #fff, 1px 0 0 #fff,
+    1px 1px 0 #fff, 0 1px 0 #fff, -1px 1px 0 #fff, -1px 0 0 #fff;
+}
+
+.citySelected {
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
+  border-radius: 100px;
 }

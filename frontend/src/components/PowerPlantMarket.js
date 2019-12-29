@@ -1,6 +1,7 @@
 import React from "react";
 import { Row, Col, Button, Modal, ModalBody } from "reactstrap";
 import PowerPlantCard from "./PowerPlantCard";
+import * as tools from "../functions";
 
 class PowerPlantMarket extends React.Component {
   constructor(props) {
@@ -36,14 +37,25 @@ class PowerPlantMarket extends React.Component {
     }
 
     const marketPlants = gameState.actualMarket.map((plant, index) => {
+      // if it's user's turn to pick a power plant
+      let clickable = false;
+      if (
+        gameState.gamePhase === "auctionPickPlant" &&
+        gameState.currentPlayer === userProfile.uuid
+      ) {
+        clickable = true;
+      }
       return (
         <Col>
           <PowerPlantCard
+            plantId={plant}
+            userId={userProfile.uuid}
             key={index}
             cost={powerPlants[plant].cost}
             type={powerPlants[plant].type}
             input={powerPlants[plant].resourcesNeeded}
             output={powerPlants[plant].citiesPowered}
+            clickable={clickable}
           />
         </Col>
       );
@@ -58,6 +70,7 @@ class PowerPlantMarket extends React.Component {
             type={powerPlants[plant].type}
             input={powerPlants[plant].resourcesNeeded}
             output={powerPlants[plant].citiesPowered}
+            onClick=""
           />
         </Col>
       );
@@ -84,13 +97,13 @@ class PowerPlantMarket extends React.Component {
                 </Row>
                 <Row className="mt-2">
                   <Col>
-                    <h3>Available for purchase</h3>
+                    <h4>Available for purchase</h4>
                   </Col>
                 </Row>
                 <Row>{marketPlants}</Row>
-                <Row className="mt-2">
+                <Row className="mt-4">
                   <Col>
-                    <h3>Future market</h3>
+                    <h4>Future market</h4>
                   </Col>
                 </Row>
                 <Row>{futurePlants}</Row>

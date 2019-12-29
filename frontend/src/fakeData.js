@@ -241,8 +241,8 @@ const powerPlants = {
   25: {
     type: "ecological",
     cost: 27,
-    resourcesNeeded: 3,
-    citiesPowered: 1
+    resourcesNeeded: 0,
+    citiesPowered: 3
   },
   26: {
     type: "uranium",
@@ -413,15 +413,15 @@ const gameState = {
   players: {
     PLYR1: {
       name: "Lightning Bug, LLC.",
-      color: "blue"
+      color: "Red"
     },
     PLYR2: {
       name: "Oil Barron, Inc.",
-      color: "green"
+      color: "Black"
     },
     PLYR3: {
       name: "Armco, Co.",
-      color: "red"
+      color: "Blue"
     }
   },
   playerOrder: ["PLYR2", "PLYR3", "PLYR1"],
@@ -459,8 +459,8 @@ const gameState = {
     PLYR2: ["boise"],
     PLYR3: ["billings"]
   },
-  actualMarket: ["10", "11", "12", "13"],
-  futureMarket: ["14", "15", "16", "17"],
+  actualMarket: ["18", "19", "20", "21"],
+  futureMarket: ["30", "31", "28", "25"],
   gamePhase: "auctionBidding", // "auctionPickPlant", "auctionBidding",
   currentBid: 0,
   highestBidder: "PLYR3"

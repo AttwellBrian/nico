@@ -11,6 +11,8 @@ import {
 import City from "./components/City";
 import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
+import Login from "./components/Login";
+
 import { Button } from "reactstrap";
 import * as tools from "./functions";
 
@@ -88,6 +90,7 @@ class App extends React.Component {
         currentBid: 0
       },
       powerPlants: {},
+      showGame: false,
       showPowerPlantMarket: false,
       highestBidder: ""
     };
@@ -145,6 +148,8 @@ class App extends React.Component {
   }
 
   render() {
+    // login prep
+
     // Prep map data
     let citiesArray = [];
     let connectionsArray = [];
@@ -209,34 +214,39 @@ class App extends React.Component {
 
     return (
       <div className="App">
-        <div className="topBar"></div>
-        <div className="resourcesContainer">
-          <div className="containerTitle">Resources Market</div>
-        </div>
-        <div className="userContainer">
-          <div className="containerTitle">{userProfile.name}</div>
-        </div>
+        <Login parent={this} gameState={this.state.gameState} />
+        {this.state.showGame === true && (
+          <div>
+            <div className="topBar"></div>
+            <div className="resourcesContainer">
+              <div className="containerTitle">Resources Market</div>
+            </div>
+            <div className="userContainer">
+              <div className="containerTitle">{userProfile.name}</div>
+            </div>
 
-        <div className="marketContainer">
-          <PowerPlantMarket
-            state={this.state}
-            parentToggle={this.toggleShowPowerPlantModal}
-          />
-        </div>
-        <div className="playersContainer">
-          <div className="containerTitle">The Competition</div>
-        </div>
-        <div className="connections">
-          <div className="connectionPipesContainer">{allConnections} </div>
-        </div>
-        <div className="mainMap">
-          {cities}
-          <img
-            className="mainMapImage"
-            alt="Map of US Background"
-            src={mainMapImage}
-          />
-        </div>
+            <div className="marketContainer">
+              <PowerPlantMarket
+                state={this.state}
+                parentToggle={this.toggleShowPowerPlantModal}
+              />
+            </div>
+            <div className="playersContainer">
+              <div className="containerTitle">The Competition</div>
+            </div>
+            <div className="connections">
+              <div className="connectionPipesContainer">{allConnections} </div>
+            </div>
+            <div className="mainMap">
+              {cities}
+              <img
+                className="mainMapImage"
+                alt="Map of US Background"
+                src={mainMapImage}
+              />
+            </div>
+          </div>
+        )}
       </div>
     );
   }
