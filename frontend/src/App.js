@@ -1,9 +1,19 @@
 import React from "react";
 import "./App.css";
 import mainMapImage from "./assets/images/usmap-background.jpg";
-import { map, userProfile, gameState, powerPlants } from "./fakeData";
+import {
+  map,
+  userProfile,
+  gameState,
+  gameStatePre,
+  powerPlants
+} from "./fakeData";
 import City from "./components/City";
+import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
+import Login from "./components/Login";
+
+import { Button } from "reactstrap";
 import * as tools from "./functions";
 
 class App extends React.Component {
@@ -13,7 +23,7 @@ class App extends React.Component {
       userProfile: {
         name: "",
         color: "",
-        uuid: "" // uuidABC
+        uuid: "PLYR1" // uuidABC
       },
       gameState: {
         players: {
@@ -75,23 +85,88 @@ class App extends React.Component {
           "plantUUID",
           "plantUUID",
           */
-        ]
+        ],
+        gamePhase: "",
+        currentBid: 0
       },
-      powerPlants: {}
+      powerPlants: {},
+      showGame: false,
+      showPowerPlantMarket: false,
+      highestBidder: "",
+      selectedCities: [],
+      costToPurchaseCities: 0
     };
+    this.toggleShowPowerPlantModal = this.toggleShowPowerPlantModal.bind(this);
+    this.addRemoveSelectedCity = this.addRemoveSelectedCity.bind(this);
   }
+
+  toggleShowPowerPlantModal() {
+    this.setState(prevState => ({
+      showPowerPlantMarket: !prevState.showPowerPlantMarket
+    }));
+  }
+
+  addRemoveSelectedCity = (city, addTrue) => {
+    // make a new array of temporarily selected power plants
+    let selectedCities = this.state.selectedCities;
+    if (addTrue === true) {
+      selectedCities.push(city);
+    }
+    if (addTrue === false) {
+      let targetIndex = selectedCities.indexOf(city);
+      selectedCities.splice(targetIndex, 1);
+    }
+
+    console.log(selectedCities);
+  };
 
   componentDidUpdate() {}
 
   componentDidMount() {
-    this.setState({
-      userProfile: userProfile,
-      gameState: gameState,
-      powerPlants: powerPlants
-    });
+    // first ping the API for the first initial state
+    // FAKE API RETURN HERE (actually, we imported it from fakeData.js)
+    // then set initial state so there's a state
+    let self = this;
+    this.setState(
+      {
+        userProfile: userProfile,
+        gameState: gameStatePre,
+        powerPlants: powerPlants
+      },
+      () => {
+        // after first state is set, setInterval to ping gameState API every 100ms
+        this.interval = setInterval(function() {
+          // ping API every 100ms
+          // FAKE API RETURN HERE (actually we imported it from fakeData.js)
+
+          // Now run all the callback checks
+          // Check to see if it is the first time we are entering auctionPickPlant so we can pop the modal up
+          if (
+            self.state.gameState.gamePhase !== "auctionPickPlant" &&
+            gameState.gamePhase === "auctionPickPlant" &&
+            self.state.showPowerPlantMarket === false
+          ) {
+            self.setState({
+              showPowerPlantMarket: true
+            });
+          }
+
+          // Finally, update the gameState
+          self.setState({
+            gameState: gameState
+          });
+        }, 100);
+      }
+    );
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   render() {
+    // login prep
+
     // Prep map data
     let citiesArray = [];
     let connectionsArray = [];
@@ -118,6 +193,7 @@ class App extends React.Component {
           id={city.id}
           top={city.top}
           left={city.left}
+          addRemoveSelectedCity={this.addRemoveSelectedCity}
         />
       );
     });
@@ -156,31 +232,39 @@ class App extends React.Component {
 
     return (
       <div className="App">
-        <div className="topBar"></div>
-        <div className="resourcesContainer">
-          <div className="containerTitle">Resources Market</div>
-        </div>
-        <div className="userContainer">
-          <div className="containerTitle">{userProfile.name}</div>
-        </div>
+        <Login parent={this} gameState={this.state.gameState} />
+        {this.state.showGame === true && (
+          <div>
+            <div className="topBar"></div>
+            <div className="resourcesContainer">
+              <div className="containerTitle">Resources Market</div>
+            </div>
+            <div className="userContainer">
+              <div className="containerTitle">{userProfile.name}</div>
+            </div>
 
-        <div className="marketContainer">
-          <div className="containerTitle">Powerplant Market</div>
-        </div>
-        <div className="playersContainer">
-          <div className="containerTitle">The Competition</div>
-        </div>
-        <div className="connections">
-          <div className="connectionPipesContainer">{allConnections} </div>
-        </div>
-        <div className="mainMap">
-          {cities}
-          <img
-            className="mainMapImage"
-            alt="Map of US Background"
-            src={mainMapImage}
-          />
-        </div>
+            <div className="marketContainer">
+              <PowerPlantMarket
+                state={this.state}
+                parentToggle={this.toggleShowPowerPlantModal}
+              />
+            </div>
+            <div className="playersContainer">
+              <div className="containerTitle">The Competition</div>
+            </div>
+            <div className="connections">
+              <div className="connectionPipesContainer">{allConnections} </div>
+            </div>
+            <div className="mainMap">
+              {cities}
+              <img
+                className="mainMapImage"
+                alt="Map of US Background"
+                src={mainMapImage}
+              />
+            </div>
+          </div>
+        )}
       </div>
     );
   }
