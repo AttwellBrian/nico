@@ -46,4 +46,8 @@ abstract class ServerModule {
   @Binds
   @IntoSet
   abstract Interceptor devCorsInterceptor(DevCorsInterceptor interceptor);
+
+  @Binds
+  @IntoSet
+  abstract Interceptor loggerInterceptor(LoggerInterceptor loggerInterceptor);
 }

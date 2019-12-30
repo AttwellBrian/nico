@@ -17,7 +17,6 @@ class DevCorsInterceptor extends Interceptor {
   @Override
   protected void afterAfter(Request request, Response response) {
     if (request.host().startsWith("localhost:")) {
-      LOGGER.info("Adding CORS headers.");
       response.header("Access-Control-Allow-Origin", "http://localhost:3000");
       response.header("Access-Control-Allow-Methods", "*");
     }
