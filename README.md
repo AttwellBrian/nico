@@ -1,7 +1,6 @@
 Backend Debugging
 -------
-If you start the program with `./gradlew :service:dockerBuildImage && docker-compose down && docker-compose up` then
-you can attach a remote debugger to port 5005.
+Start the program with `./gradlew run` then you can attach a remote debugger to port 5005.
 
 Frontend Debugging
 -------
