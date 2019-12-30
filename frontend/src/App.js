@@ -12,6 +12,7 @@ import City from "./components/City";
 import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
 import Login from "./components/Login";
+import axios from "axios";
 
 import { Button } from "reactstrap";
 import * as tools from "./functions";
@@ -166,7 +167,9 @@ class App extends React.Component {
 
   render() {
     // login prep
-
+    axios.get(`http://localhost:8080/state`).then(data => {
+      console.log(data);
+    });
     // Prep map data
     let citiesArray = [];
     let connectionsArray = [];
