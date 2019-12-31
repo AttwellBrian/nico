@@ -107,16 +107,17 @@ class App extends React.Component {
     }));
   }
 
-  addRemoveSelectedCity = (city, addTrue) => {
+  addRemoveSelectedCity = city => {
     // make a new array of temporarily selected power plants
     let selectedCities = this.state.selectedCities;
-    if (addTrue === true) {
+    if (!selectedCities.includes(city)) {
       selectedCities.push(city);
-    }
-    if (addTrue === false) {
+    } else {
       let targetIndex = selectedCities.indexOf(city);
       selectedCities.splice(targetIndex, 1);
     }
+
+    //
 
     console.log(selectedCities);
   };
@@ -167,9 +168,9 @@ class App extends React.Component {
 
   render() {
     // login prep
-    axios.get(`http://localhost:8080/state`).then(data => {
+    /*axios.get(`http://localhost:8080/state`).then(data => {
       console.log(data);
-    });
+    });*/
     // Prep map data
     let citiesArray = [];
     let connectionsArray = [];
@@ -188,7 +189,87 @@ class App extends React.Component {
       }
     }
 
+    // Disable logic for cities that can't be bought (cities that aren't connected to existing cities)
+
+    var ownedCities = {};
+    let connectedCities = [];
+    let selectedCities = this.state.selectedCities;
+
+    // if user owns cities, add those as connections
+    if (
+      Object.keys(this.state.gameState.ownedCities).length > 0 &&
+      this.state.userProfile.uuid
+    ) {
+      ownedCities = this.state.gameState.ownedCities[
+        this.state.userProfile.uuid
+      ];
+      for (let i = 0; i < ownedCities.length; i++) {
+        for (let t in map.cities[ownedCities[i]].connections) {
+          connectedCities.push(map.cities[ownedCities[i]].connections[t].id);
+        }
+      }
+    }
+
+    // if user has selected cities, add those as connections
+    if (selectedCities.length > 0) {
+      for (let i = 0; i < selectedCities.length; i++) {
+        for (let t in map.cities[selectedCities[i]].connections) {
+          connectedCities.push(map.cities[selectedCities[i]].connections[t].id);
+        }
+      }
+    }
+
+    // remove duplicates from connections
+    connectedCities = [...new Set(connectedCities)];
+    // remove owned cities from connections
+    for (let i = 0; i < ownedCities.length; i++) {
+      if (connectedCities.includes(ownedCities[i])) {
+        let targetIndex = connectedCities.indexOf(ownedCities[i]);
+        connectedCities.splice(targetIndex, 1);
+      }
+    }
+
+    // if existing selected city is no longer connected, remove it
+    if (selectedCities.length > 0) {
+      for (let i = 0; i < selectedCities.length; i++) {
+        console.log(connectedCities);
+        console.log(selectedCities[i]);
+        if (!connectedCities.includes(selectedCities[i])) {
+          let targetIndex = selectedCities.indexOf(selectedCities[i]);
+          selectedCities.splice(targetIndex, 1);
+          if (this.state.selectedCities !== selectedCities) {
+            this.setState({
+              selectedCities: selectedCities
+            });
+          }
+        }
+      }
+    }
+
     const cities = citiesArray.map((city, index) => {
+      // disable city is owned
+      let disabled = "";
+      if (
+        Object.keys(this.state.gameState.ownedCities).length > 0 &&
+        this.state.userProfile.uuid
+      ) {
+        if (ownedCities.includes(city.id)) {
+          disabled = "disabled";
+        }
+      }
+
+      // disable if city is not in connected cities
+      console.log(connectedCities);
+
+      if (!connectedCities.includes(city.id)) {
+        disabled = "disabled";
+      }
+
+      let selected = false;
+      if (selectedCities.includes(city.id)) {
+        selected = true;
+      }
+
       return (
         <City
           key={index}
@@ -197,6 +278,12 @@ class App extends React.Component {
           top={city.top}
           left={city.left}
           addRemoveSelectedCity={this.addRemoveSelectedCity}
+          disabled={disabled}
+          ownedCities={
+            this.state.gameState.ownedCities[this.state.userProfile.uuid]
+          }
+          selectedCities={this.state.selectedCities}
+          selected={selected}
         />
       );
     });
@@ -252,9 +339,10 @@ class App extends React.Component {
                 parentToggle={this.toggleShowPowerPlantModal}
               />
             </div>
-            <div className="playersContainer">
+            {/* <div className="playersContainer">
               <div className="containerTitle">The Competition</div>
-            </div>
+            </div> */}
+
             <div className="connections">
               <div className="connectionPipesContainer">{allConnections} </div>
             </div>

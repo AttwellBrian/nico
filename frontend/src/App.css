@@ -253,6 +253,27 @@ h6 {
   z-index: 20;
 }
 
+.cityContainer:hover {
+  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.disabled:hover {
+  box-shadow: none;
+  cursor: default;
+  border-radius: 0px;
+}
+
+.citySelected {
+  box-shadow: 0 0 10px #f3d248, 0 0 20px #f3d248, 0 0 30px #f3d248;
+  border-radius: 100px;
+}
+
+.citySelected:hover {
+  box-shadow: 0 0 10px #f3d248, 0 0 20px #f3d248, 0 0 30px #f3d248;
+}
+
 .cityName {
   font-size: 25px;
   margin-top: 115px;
@@ -505,9 +526,4 @@ h6 {
   font-weight: bolder;
   text-shadow: -1px -1px 0 #fff, 0 -1px 0 #fff, 1px -1px 0 #fff, 1px 0 0 #fff,
     1px 1px 0 #fff, 0 1px 0 #fff, -1px 1px 0 #fff, -1px 0 0 #fff;
-}
-
-.citySelected {
-  box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #fff;
-  border-radius: 100px;
 }
