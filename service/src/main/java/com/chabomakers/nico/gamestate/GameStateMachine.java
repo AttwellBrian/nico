@@ -26,6 +26,15 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Handles state manipulation and game actions.
+ *
+ * Mostly handles bidding. Additional rules not yet implemented:
+ * 1. A user cannot have more than 3 power plants. If they buy a forth they need to discard one.
+ * 2. If no one buys a single power plant card in a game round, then we should
+ *    discard the lowest power plant.
+ * 3. We don't do anything special to determine player order before bidding.
+ */
 @Singleton
 public class GameStateMachine {
 
@@ -70,10 +79,11 @@ public class GameStateMachine {
         if (currentBidPlant != null) {
           throw new BadRequestException("Choosing a plant when a plant is already chosen.");
         }
-        if (action.bid() == null) {
+        Integer currentBid = action.bid();
+        if (currentBid == null) {
           throw new BadRequestException("Bid value cannot be null when submitting a bid.");
         }
-        validateBid(action.userId(), action.bid());
+        validateBid(action.userId(), currentBid);
         currentPowerPlantBid = action.bid();
         highestBidUser = action.userId();
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
@@ -86,7 +96,7 @@ public class GameStateMachine {
         if (gameRound == 0) {
           throw new BadRequestException("Cannot pass during a user's first AUCTION_PICK_PLANT.");
         }
-        // TODO: test this case.
+        // TODO: test this case once we have a test that can complete an entire game round.
         selectNextBidUser();
       } else {
         throw new BadRequestException("Can only pass or choose plant during this phase.");
