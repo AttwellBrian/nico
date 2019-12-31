@@ -65,7 +65,7 @@ public class GameStateMachineImpl {
 
   public GameStateMachineImpl() {}
 
-  public synchronized UserRow createUser(String username, String color) {
+  public UserRow createUser(String username, String color) {
     ImmutableUserRow newUser =
         ImmutableUserRow.builder().color(color).id(UUID.randomUUID()).name(username).build();
     users.put(newUser.id(), newUser);
@@ -74,7 +74,7 @@ public class GameStateMachineImpl {
     return newUser;
   }
 
-  public synchronized void performAuctionAction(AuctionAction action) {
+  public void performAuctionAction(AuctionAction action) {
     if (gamePhase == AUCTION_PICK_PLANT) {
       if (action.actionType() == CHOOSE_PLANT) {
         if (currentBidPlant != null) {
