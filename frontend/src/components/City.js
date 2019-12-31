@@ -1,5 +1,4 @@
 import React from "react";
-import { Button } from "reactstrap";
 
 class City extends React.Component {
   constructor(props) {

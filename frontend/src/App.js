@@ -12,9 +12,6 @@ import City from "./components/City";
 import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
 import Login from "./components/Login";
-import axios from "axios";
-
-import { Button } from "reactstrap";
 import * as tools from "./functions";
 
 class App extends React.Component {
@@ -125,6 +122,7 @@ class App extends React.Component {
   componentDidUpdate() {}
 
   componentDidMount() {
+    tools.apiUpdateState();
     // first ping the API for the first initial state
     // FAKE API RETURN HERE (actually, we imported it from fakeData.js)
     // then set initial state so there's a state
@@ -168,9 +166,6 @@ class App extends React.Component {
 
   render() {
     // login prep
-    /*axios.get(`http://localhost:8080/state`).then(data => {
-      console.log(data);
-    });*/
     // Prep map data
     let citiesArray = [];
     let connectionsArray = [];
@@ -259,8 +254,6 @@ class App extends React.Component {
       }
 
       // disable if city is not in connected cities
-      console.log(connectedCities);
-
       if (!connectedCities.includes(city.id)) {
         disabled = "disabled";
       }
