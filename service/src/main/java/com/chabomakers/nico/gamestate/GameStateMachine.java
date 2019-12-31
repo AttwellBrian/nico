@@ -30,12 +30,14 @@ import org.slf4j.LoggerFactory;
 public class GameStateMachine {
 
   private static final Logger LOGGER = LoggerFactory.getLogger(GameStateMachine.class);
+  private static final int USER_STARTING_MONEY = 50;
 
   private final Map<UUID, List<PowerPlantCard>> usersCards = Maps.newHashMap();
   private final Map<UUID, UserRow> users = Maps.newHashMap();
   private GamePhase gamePhase = LOBBY;
   private PowerPlantMarket powerPlantMarket = PowerPlantMarket.createFreshDeck();
   private int gameRound = 0;
+  private Map<UUID, Integer> userMoney = Maps.newHashMap();
 
   // Auction + Bidding state
   private int auctionNumber = 0;
@@ -53,19 +55,16 @@ public class GameStateMachine {
   @Inject
   public GameStateMachine() {}
 
-  public Collection<UserRow> getUsers() {
-    return users.values();
-  }
-
-  public UserRow createUser(String username, String color) {
+  public synchronized UserRow createUser(String username, String color) {
     ImmutableUserRow newUser =
         ImmutableUserRow.builder().color(color).id(UUID.randomUUID()).name(username).build();
     users.put(newUser.id(), newUser);
     usersCards.put(newUser.id(), Lists.newArrayList());
+    userMoney.put(newUser.id(), USER_STARTING_MONEY);
     return newUser;
   }
 
-  public void performAuctionAction(AuctionAction action) {
+  public synchronized void performAuctionAction(AuctionAction action) {
     if (gamePhase == AUCTION_PICK_PLANT) {
       if (action.actionType() == CHOOSE_PLANT) {
         if (currentBidPlant != null) {
@@ -74,6 +73,7 @@ public class GameStateMachine {
         if (action.bid() == null) {
           throw new BadRequestException("Bid value cannot be null when submitting a bid.");
         }
+        validateBid(action.userId(), action.bid());
         currentPowerPlantBid = action.bid();
         highestBidUser = action.userId();
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
@@ -101,6 +101,7 @@ public class GameStateMachine {
           if (bidValue == null || bidValue <= currentPowerPlantBid) {
             throw new BadRequestException("Invalid bid value.");
           }
+          validateBid(currentUser, bidValue);
           currentPowerPlantBid = bidValue;
           highestBidUser = currentUser;
           selectNextBidUser();
@@ -117,6 +118,17 @@ public class GameStateMachine {
       return;
     }
     throw new BadRequestException("Not in auction powerplant phase or bid phase.");
+  }
+
+  private void validateBid(UUID user, int bid) {
+    Integer currentMoney = userMoney.get(user);
+    if (currentMoney < bid) {
+      throw new BadRequestException("User has too little money for this bid.");
+    }
+  }
+
+  private Collection<UserRow> getUsers() {
+    return users.values();
   }
 
   private Set<UUID> playersWhoCantBidInCurrentAuction() {
@@ -137,6 +149,7 @@ public class GameStateMachine {
     powerPlantMarket.removeCard(currentBidPlant);
     usersCards.get(highestBidUser).add(currentBidPlant);
     playersWhoHaveWonAuctions.add(highestBidUser);
+    userMoney.put(highestBidUser, userMoney.get(highestBidUser) - currentPowerPlantBid);
     currentBidPlant = null;
     currentPowerPlantBid = null;
     highestBidUser = null;
@@ -153,11 +166,11 @@ public class GameStateMachine {
     } while (playersWhoCantBidInCurrentAuction().contains(currentBidUser()));
   }
 
-  public GamePhase gamePhase() {
+  public synchronized GamePhase gamePhase() {
     return gamePhase;
   }
 
-  public GameStateResponse gameState() {
+  public synchronized GameStateResponse gameState() {
     Collection<UserRow> userRows = getUsers();
     final List<User> users = userRows.stream().map(User::toUser).collect(Collectors.toList());
     return ImmutableGameStateResponse.builder()
@@ -168,6 +181,7 @@ public class GameStateMachine {
         .futureMarket(powerPlantMarket.futureMarket())
         .currentPowerPlantBid(currentPowerPlantBid)
         .currentBidPowerPlant(currentBidPlant)
+        .userMoney(userMoney)
         .gameRound(gameRound)
         .userPowerPlants(usersCards)
         .userWithHighestPowerplantBid(highestBidUser)
@@ -176,7 +190,7 @@ public class GameStateMachine {
         .build();
   }
 
-  public void startGame() {
+  public synchronized void startGame() {
     assignUserOrder();
     initializeAuctionPhase();
   }

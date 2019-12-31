@@ -70,6 +70,9 @@ public class GameStateMachineIntegrationTest {
     Assertions.assertEquals(gameStateMachine.gameState().currentUser(), player2Id);
     Assertions.assertEquals(gameStateMachine.gameState().userWithHighestPowerplantBid(), player1Id);
     Truth.assertThat(gameStateMachine.gameState().usersPassedFromBidding()).containsExactly();
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player1Id)).isEqualTo(50);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player2Id)).isEqualTo(50);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player3Id)).isEqualTo(50);
 
     auctionAction =
         ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player2Id).build();
@@ -82,6 +85,9 @@ public class GameStateMachineIntegrationTest {
     auctionAction =
         ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player3Id).build();
     gameStateMachine.performAuctionAction(auctionAction);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player1Id)).isEqualTo(45);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player2Id)).isEqualTo(50);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player3Id)).isEqualTo(50);
 
     // Since both users passed, we are now onto the phase where the second user gets to
     // choose a plant to begin bidding on.
@@ -106,6 +112,9 @@ public class GameStateMachineIntegrationTest {
             .build();
     gameStateMachine.performAuctionAction(auctionAction);
     Truth.assertThat(gameStateMachine.gameState().currentUser()).isEqualTo(player3Id);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player1Id)).isEqualTo(45);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player2Id)).isEqualTo(50);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player3Id)).isEqualTo(50);
 
     auctionAction =
         ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player3Id).build();
@@ -118,6 +127,9 @@ public class GameStateMachineIntegrationTest {
     Truth.assertThat(gameStateMachine.gameState().gamePhase())
         .isEqualTo(GamePhase.AUCTION_PICK_PLANT);
     Truth.assertThat(userPowerPlants.get(player2Id)).containsExactly(secondPowerPlant);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player1Id)).isEqualTo(45);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player2Id)).isEqualTo(38);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player3Id)).isEqualTo(50);
 
     //
     // THIRD USER INITIATES AUCTION ON A PLANT AND WINS AUTOMATICALLY
@@ -128,7 +140,7 @@ public class GameStateMachineIntegrationTest {
             .actionType(ActionType.CHOOSE_PLANT)
             .choosePlantId(auctionedPowerPLant.id())
             .userId(player3Id)
-            .bid(12)
+            .bid(13)
             .build();
     gameStateMachine.performAuctionAction(auctionAction);
 
@@ -137,6 +149,9 @@ public class GameStateMachineIntegrationTest {
     Truth.assertThat(gameState.gamePhase()).isEqualTo(GamePhase.BUYING_RESOURCES);
     userPowerPlants = gameState.userPowerPlants();
     Truth.assertThat(userPowerPlants.get(player3Id)).containsExactly(auctionedPowerPLant);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player1Id)).isEqualTo(45);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player2Id)).isEqualTo(38);
+    Truth.assertThat(gameStateMachine.gameState().userMoney().get(player3Id)).isEqualTo(37);
   }
 
   @Test
