@@ -3,6 +3,7 @@ package com.chabomakers.nico;
 import com.chabomakers.nico.controllers.AuctionActionController;
 import com.chabomakers.nico.controllers.CreateUserController;
 import com.chabomakers.nico.controllers.GameStateController;
+import com.chabomakers.nico.controllers.ResetController;
 import com.chabomakers.nico.controllers.StartGameController;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -34,6 +35,10 @@ abstract class ServerModule {
   @Binds
   @IntoSet
   abstract Controller usersController(GameStateController controller);
+
+  @Binds
+  @IntoSet
+  abstract Controller resetController(ResetController controller);
 
   @Binds
   @IntoSet
