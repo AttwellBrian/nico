@@ -14,11 +14,11 @@ function bidOnPowerPlant(userId, plantId) {
 }
 
 function resetPlayers() {
-  alert(resetPlayers);
+  console.log(resetPlayers);
 }
 
 function newPlayer(player) {
-  alert(player.name + " (" + player.color + ") has joined");
+  console.log(player.name + " (" + player.color + ") has joined");
 }
 
 export { pyth };

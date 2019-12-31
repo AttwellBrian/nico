@@ -455,7 +455,7 @@ const gameState = {
     }
   },
   ownedCities: {
-    PLYR1: ["seattle"],
+    PLYR1: ["portland"],
     PLYR2: ["boise"],
     PLYR3: ["billings"]
   },
