@@ -1,6 +1,7 @@
 package com.chabomakers.nico.gamestate;
 
 import static com.chabomakers.nico.gamestate.AuctionAction.ActionType.CHOOSE_PLANT;
+import static com.chabomakers.nico.gamestate.AuctionAction.ActionType.PASS;
 import static com.chabomakers.nico.gamestate.GameStateMachine.GamePhase.*;
 
 import com.chabomakers.nico.BadRequestException;
@@ -13,6 +14,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +35,7 @@ public class GameStateMachine {
   private final Map<UUID, UserRow> users = Maps.newHashMap();
   private GamePhase gamePhase = LOBBY;
   private PowerPlantMarket powerPlantMarket = PowerPlantMarket.createFreshDeck();
+  private int gameRound = 0;
 
   // Auction + Bidding state
   private int auctionNumber = 0;
@@ -76,12 +79,17 @@ public class GameStateMachine {
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
         currentBidIndex = (auctionNumber + 1) % users.size();
         gamePhase = AUCTION_BIDDING;
-        if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
+        if (playersWhoCantBidInCurrentAuction().size() == playerOrder.size() - 1) {
           handleAllBiddersDone();
         }
+      } else if (action.actionType() == PASS) {
+        if (gameRound == 0) {
+          throw new BadRequestException("Cannot pass during a user's first AUCTION_PICK_PLANT.");
+        }
+        // TODO: test this case.
+        selectNextBidUser();
       } else {
-        // TODO: need to implement this logic.
-        //  Requires handling some extra cases since everyone can pass on a power plant now.
+        throw new BadRequestException("Can only pass or choose plant during this phase.");
       }
       return;
     }
@@ -98,7 +106,7 @@ public class GameStateMachine {
           selectNextBidUser();
         } else if (action.actionType() == ActionType.PASS) {
           currentBidPassedUsers.add(currentUser);
-          if (currentBidPassedUsers.size() == playerOrder.size() - 1) {
+          if (playersWhoCantBidInCurrentAuction().size() == playerOrder.size() - 1) {
             handleAllBiddersDone();
           } else {
             // Let the next user have a shot at bidding.
@@ -111,17 +119,28 @@ public class GameStateMachine {
     throw new BadRequestException("Not in auction powerplant phase or bid phase.");
   }
 
+  private Set<UUID> playersWhoCantBidInCurrentAuction() {
+    HashSet<UUID> uuids = Sets.newHashSet(currentBidPassedUsers);
+    uuids.addAll(playersWhoHaveWonAuctions);
+    return uuids;
+  }
+
   /** Handle the transition that occurs when all the current auction's bidders are done. */
   private void handleAllBiddersDone() {
     LOGGER.info("All user's but one has passed on the current auction.");
     gamePhase = AUCTION_PICK_PLANT;
+    if (gameRound == 0 && highestBidUser == currentPlantPickerUser()) {
+      auctionNumber = auctionNumber + 1;
+    } else {
+      LOGGER.info("User get's to pick another plant since they didn't win their first pick.");
+    }
     powerPlantMarket.removeCard(currentBidPlant);
     usersCards.get(highestBidUser).add(currentBidPlant);
     playersWhoHaveWonAuctions.add(highestBidUser);
     currentBidPlant = null;
     currentPowerPlantBid = null;
-    auctionNumber = auctionNumber + 1;
     highestBidUser = null;
+    currentBidPassedUsers = Sets.newHashSet();
     if (auctionNumber == playerOrder.size()) {
       gamePhase = BUYING_RESOURCES;
       resourceBuyNumber = 0;
@@ -131,8 +150,7 @@ public class GameStateMachine {
   private void selectNextBidUser() {
     do {
       currentBidIndex = (currentBidIndex + 1) % users.size();
-    } while (currentBidPassedUsers.contains(currentBidUser())
-        || playersWhoHaveWonAuctions.contains(currentBidUser()));
+    } while (playersWhoCantBidInCurrentAuction().contains(currentBidUser()));
   }
 
   public GamePhase gamePhase() {
@@ -150,6 +168,7 @@ public class GameStateMachine {
         .futureMarket(powerPlantMarket.futureMarket())
         .currentPowerPlantBid(currentPowerPlantBid)
         .currentBidPowerPlant(currentBidPlant)
+        .gameRound(gameRound)
         .userPowerPlants(usersCards)
         .userWithHighestPowerplantBid(highestBidUser)
         .usersPassedFromBidding(currentBidPassedUsers)

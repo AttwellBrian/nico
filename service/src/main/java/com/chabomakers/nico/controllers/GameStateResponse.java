@@ -21,6 +21,8 @@ public interface GameStateResponse {
 
   Map<UUID, List<PowerPlantCard>> userPowerPlants();
 
+  Integer gameRound();
+
   @Nullable
   UUID currentUser();
 
