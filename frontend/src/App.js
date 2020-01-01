@@ -47,6 +47,17 @@ class App extends React.Component {
           ]
           */
         },
+        ownedMoney: {
+          /*
+          uuidABC: {
+            money: 95,
+            coal: 25,
+            garbage: 15,
+            uranium: 12,
+            oil: 22
+          }
+          */
+        },
         ownedResources: {
           /*
           uuidABC: {
