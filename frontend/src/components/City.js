@@ -10,14 +10,7 @@ class City extends React.Component {
   }
 
   toggleClick() {
-    this.setState(
-      prevState => ({
-        clicked: !prevState.clicked
-      }),
-      () => {
-        this.props.addRemoveSelectedCity(this.props.id, this.state.clicked);
-      }
-    );
+    this.props.addRemoveSelectedCity(this.props.id);
   }
 
   componentDidUpdate() {}
@@ -31,20 +24,18 @@ class City extends React.Component {
       left: cssLeft
     };
 
-    let owned = false;
     let selected = "";
-    if (this.state.clicked === true) {
+    if (this.props.selected === true) {
       selected = "citySelected";
     }
 
     return (
       <div>
         <div
-          className={"cityContainer " + selected}
+          className={"cityContainer " + selected + " " + this.props.disabled}
           style={positionStyle}
           id={"ID" + this.props.id}
-          disabled={owned}
-          onClick={this.toggleClick}
+          onClick={this.props.disabled === "" ? this.toggleClick : undefined}
         >
           <div className="cityName">{this.props.name}</div>
         </div>

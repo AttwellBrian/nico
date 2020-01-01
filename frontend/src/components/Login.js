@@ -118,8 +118,9 @@ class Login extends React.Component {
               ))}
             </div>
             <div className="existingPlayers">
-              {playersArray.map(player => (
+              {playersArray.map((player, index) => (
                 <div
+                  key={index}
                   className="existingPlayer"
                   onClick={() => {
                     this.handleExistingPlayer(player);
