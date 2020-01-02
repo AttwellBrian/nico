@@ -112,7 +112,7 @@ class App extends React.Component {
             </div>
             <div className="userContainer">
               <div className="containerTitle">
-                {this.state.userProfile.name.name}
+                {this.state.userProfile.name}
               </div>
             </div>
 
