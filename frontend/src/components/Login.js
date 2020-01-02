@@ -34,7 +34,7 @@ class Login extends React.Component {
   }
 
   handleReset() {
-    tools.resetPlayers();
+    tools.resetPlayers(this.props.parent);
   }
 
   handleSubmit(event) {

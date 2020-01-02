@@ -116,7 +116,6 @@ function generateMap(that) {
 
 function replaceEditMatch(
   apiState,
-  outputState,
   serverName,
   clientName,
   arrayToMapTrue,
@@ -126,19 +125,21 @@ function replaceEditMatch(
   // if we need to covert an array to an object
   if (arrayToMapTrue) {
     // create object from array
+    let outputNameObject = {};
     for (let i = 0; i < apiState[serverName].length; i++) {
       for (let t = 0; t < serverKeys.length; t++) {
-        if (!outputState[clientName]) {
-          outputState[clientName] = {};
+        if (!outputNameObject[clientName]) {
+          outputNameObject[clientName] = {};
         }
-        if (!outputState[clientName][apiState[serverName][i].id]) {
-          outputState[clientName][apiState[serverName][i].id] = {};
+        if (!outputNameObject[clientName][apiState[serverName][i].id]) {
+          outputNameObject[clientName][apiState[serverName][i].id] = {};
         }
-        outputState[clientName][apiState[serverName][i].id][clientKeys[t]] =
-          apiState[serverName][i][serverKeys[t]];
+        outputNameObject[clientName][apiState[serverName][i].id][
+          clientKeys[t]
+        ] = apiState[serverName][i][serverKeys[t]];
       }
     }
-    return outputState[clientName];
+    return outputNameObject[clientName];
   } else {
     // otherwise, just translate the words
     if (apiState[serverName]) {
@@ -169,15 +170,11 @@ function replaceEditMatch(
 }
 
 function translateState(apiState) {
-  console.log(constants.emptyGameStateSchema);
   let outputState = constants.emptyGameStateSchema; // define an empty state schema to start
-
   let replaceEditMatchArray = constants.translationsNeeded;
-
   for (let i = 0; i < replaceEditMatchArray.length; i++) {
     outputState[replaceEditMatchArray[i].clientName] = replaceEditMatch(
       apiState,
-      outputState,
       replaceEditMatchArray[i].serverName,
       replaceEditMatchArray[i].clientName,
       replaceEditMatchArray[i].arrayToMapTrue,
@@ -185,11 +182,36 @@ function translateState(apiState) {
       replaceEditMatchArray[i].clientKeys
     );
   }
-
   return outputState;
 }
 
 function apiUpdateState(that) {
+  axios.get(constants.serverURL + `/state`).then(data => {
+    // take the returned data and translate it
+    let translatedState = translateState(data.data);
+    // CALLBACK CHECKS
+
+    // 1. Check to see if we are entering auctionPickPlant so we can pop the modal up
+    if (
+      translatedState.gamePhase !== "auctionPickPlant" &&
+      translatedState.gamePhase === "auctionPickPlant" &&
+      that.state.showPowerPlantMarket === false
+    ) {
+      that.setState({
+        showPowerPlantMarket: true
+      });
+    }
+
+    // CALLBACK CHECKS COMPLETE
+
+    // Update the gameState
+    that.setState({
+      gameState: translatedState
+    });
+  });
+}
+
+function apiUpdateStateInterval(that) {
   that.setState(
     {
       userProfile: constants.emptyClientGameStateSchema.userProfile,
@@ -198,29 +220,7 @@ function apiUpdateState(that) {
     () => {
       // after first state is set, setInterval to ping gameState API every 100ms
       that.interval = setInterval(function() {
-        axios.get(constants.serverURL + `/state`).then(data => {
-          // take the returned data and translate it
-          const translatedState = translateState(data.data);
-          // CALLBACK CHECKS
-
-          // 1. Check to see if we are entering auctionPickPlant so we can pop the modal up
-          if (
-            translatedState.gamePhase !== "auctionPickPlant" &&
-            translatedState.gamePhase === "auctionPickPlant" &&
-            that.state.showPowerPlantMarket === false
-          ) {
-            that.setState({
-              showPowerPlantMarket: true
-            });
-          }
-
-          // CALLBACK CHECKS COMPLETE
-
-          // Update the gameState
-          that.setState({
-            gameState: translatedState
-          });
-        });
+        apiUpdateState(that);
         // do every 100ms
       }, 100);
     }
@@ -238,14 +238,13 @@ function apiCreateUser(player, loginScreen, parent) {
         player.color
     )
     .then(data => {
-      console.log(data);
       // hide the login screen
       loginScreen.setState({ show: false });
       parent.setState({
         // set the client-side user profile
         userProfile: {
           name: player.name,
-          uuid: data.user.id,
+          uuid: data.data.user.id,
           color: player.color
         },
         // show game screen
@@ -265,8 +264,13 @@ function bidOnPowerPlant(userId, plantId) {
   alert(userId + " bid on power plant " + plantId);
 }
 
-function resetPlayers() {
-  console.log(resetPlayers);
+function resetPlayers(that) {
+  axios
+    // get data from server
+    .post(constants.serverURL + "/reset")
+    .then(data => {
+      apiUpdateState(that);
+    });
 }
 
 function newPlayer(player) {
@@ -278,6 +282,7 @@ export {
   radians_to_degrees,
   generateMap,
   apiUpdateState,
+  apiUpdateStateInterval,
   bidOnPowerPlant,
   resetPlayers,
   newPlayer,

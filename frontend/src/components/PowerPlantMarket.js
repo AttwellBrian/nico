@@ -44,11 +44,10 @@ class PowerPlantMarket extends React.Component {
         clickable = true;
       }
       return (
-        <Col>
+        <Col key={index}>
           <PowerPlantCard
             plantId={plant}
             userId={userProfile.uuid}
-            key={index}
             cost={plant.cost}
             type={plant.type}
             input={plant.resourcesNeeded}
@@ -61,9 +60,8 @@ class PowerPlantMarket extends React.Component {
 
     const futurePlants = gameState.futureMarket.map((plant, index) => {
       return (
-        <Col>
+        <Col key={index}>
           <PowerPlantCard
-            key={index}
             cost={plant.cost}
             type={plant.type}
             input={plant.resourcesNeeded}

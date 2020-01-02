@@ -37,7 +37,7 @@ class App extends React.Component {
 
   componentDidMount() {
     // create the 100ms interval for state ping from server
-    tools.apiUpdateState(this);
+    tools.apiUpdateStateInterval(this);
   }
 
   componentWillUnmount() {
