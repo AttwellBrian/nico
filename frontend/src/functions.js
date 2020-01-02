@@ -1,5 +1,4 @@
 import axios from "axios";
-import { userProfile, gameState, powerPlants } from "./fakeData";
 import * as constants from "./constants";
 
 function pyth(x, y) {
@@ -191,12 +190,10 @@ function translateState(apiState) {
 }
 
 function apiUpdateState(that) {
-  // first create an initial state with the fakeData.js
   that.setState(
     {
       userProfile: constants.emptyClientGameStateSchema.userProfile,
-      gameState: constants.emptyGameStateSchema,
-      powerPlants: powerPlants
+      gameState: constants.emptyGameStateSchema
     },
     () => {
       // after first state is set, setInterval to ping gameState API every 100ms

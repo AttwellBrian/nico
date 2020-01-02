@@ -1,7 +1,6 @@
 import React from "react";
 import "./App.css";
 import mainMapImage from "./assets/images/usmap-background.jpg";
-import { userProfile, gameState, gameStatePre, powerPlants } from "./fakeData";
 import City from "./components/City";
 import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
@@ -112,7 +111,9 @@ class App extends React.Component {
               <div className="containerTitle">Resources Market</div>
             </div>
             <div className="userContainer">
-              <div className="containerTitle">{userProfile.name}</div>
+              <div className="containerTitle">
+                {this.state.userProfile.name.name}
+              </div>
             </div>
 
             <div className="marketContainer">

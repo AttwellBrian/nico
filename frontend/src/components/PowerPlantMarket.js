@@ -1,7 +1,6 @@
 import React from "react";
 import { Row, Col, Button, Modal, ModalBody } from "reactstrap";
 import PowerPlantCard from "./PowerPlantCard";
-import * as tools from "../functions";
 
 class PowerPlantMarket extends React.Component {
   constructor(props) {
