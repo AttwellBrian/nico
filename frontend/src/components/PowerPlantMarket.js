@@ -19,7 +19,6 @@ class PowerPlantMarket extends React.Component {
   render() {
     // render city position
     const userProfile = this.props.state.userProfile;
-    const powerPlants = this.props.state.powerPlants;
     const gameState = this.props.state.gameState;
     const showModal = this.props.state.showPowerPlantMarket;
 
@@ -51,10 +50,10 @@ class PowerPlantMarket extends React.Component {
             plantId={plant}
             userId={userProfile.uuid}
             key={index}
-            cost={powerPlants[plant].cost}
-            type={powerPlants[plant].type}
-            input={powerPlants[plant].resourcesNeeded}
-            output={powerPlants[plant].citiesPowered}
+            cost={plant.cost}
+            type={plant.type}
+            input={plant.resourcesNeeded}
+            output={plant.citiesPowered}
             clickable={clickable}
           />
         </Col>
@@ -66,10 +65,10 @@ class PowerPlantMarket extends React.Component {
         <Col>
           <PowerPlantCard
             key={index}
-            cost={powerPlants[plant].cost}
-            type={powerPlants[plant].type}
-            input={powerPlants[plant].resourcesNeeded}
-            output={powerPlants[plant].citiesPowered}
+            cost={plant.cost}
+            type={plant.type}
+            input={plant.resourcesNeeded}
+            output={plant.citiesPowered}
             onClick=""
           />
         </Col>
