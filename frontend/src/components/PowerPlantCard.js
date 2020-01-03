@@ -19,7 +19,8 @@ class PowerPlantCard extends React.Component {
     // style card based on props
     // defineCardStyle
     let mainCardStyle =
-      "ppType" + this.props.type.replace(/^\w/, c => c.toUpperCase());
+      "ppType" +
+      this.props.type.toLowerCase().replace(/^\w/, c => c.toUpperCase());
 
     // render input icons
     let inputIcons = "";

@@ -34,7 +34,7 @@ class Login extends React.Component {
   }
 
   handleReset() {
-    tools.resetPlayers();
+    tools.resetPlayers(this.props.parent);
   }
 
   handleSubmit(event) {
@@ -43,18 +43,12 @@ class Login extends React.Component {
     } else {
       playerName = this.state.name;
     }
-    tools.newPlayer({ name: playerName, color: this.state.color });
-    // AFTER CALLBACK
-    this.setState({ show: false });
-    this.props.parent.setState({
-      /*userProfile: {
-        name: playerName,
-        uuid: "", // SET FROM SERVER
-        color: this.state.color
-      },*/
-      showGame: true
-    });
-
+    // send to new player
+    tools.apiCreateUser(
+      { name: playerName, color: this.state.color },
+      this,
+      this.props.parent
+    );
     event.preventDefault();
   }
 
@@ -67,7 +61,7 @@ class Login extends React.Component {
 
     let playersArray = [];
 
-    let colorsPossible = ["Red", "Black", "Blue", "Green", "Yellow"];
+    let colorsPossible = ["Red", "White", "Blue", "Green", "Yellow"];
 
     let colorsUsed = [];
     let colorsAvailable = [];
