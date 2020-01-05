@@ -10,7 +10,6 @@ import com.google.common.truth.Truth;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,14 +55,6 @@ public class GameStateMachineIntegrationTest {
             .userId(player1Id)
             .choosePlantId(secondPowerPlantCard.id())
             .build();
-    // Assert that the actual market has the card we're bidding on, before we bid on it.
-    Assertions.assertTrue(
-        gameStateResponse
-            .actualMarket()
-            .stream()
-            .map(PowerPlantCard::minimumAcceptableBid)
-            .collect(Collectors.toList())
-            .contains(2));
 
     gameStateMachine.performAuctionAction(auctionAction);
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_BIDDING);
@@ -185,14 +176,6 @@ public class GameStateMachineIntegrationTest {
             .userId(player1Id)
             .choosePlantId(powerPlantCard.id())
             .build();
-    // Assert that the actual market has the card we're bidding on, before we bid on it.
-    Assertions.assertTrue(
-        gameStateResponse
-            .actualMarket()
-            .stream()
-            .map(PowerPlantCard::minimumAcceptableBid)
-            .collect(Collectors.toList())
-            .contains(2));
 
     gameStateMachine.performAuctionAction(auctionAction);
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_BIDDING);
@@ -264,14 +247,6 @@ public class GameStateMachineIntegrationTest {
             .userId(player1Id)
             .choosePlantId(secondPowerPlantCard.id())
             .build();
-    // Assert that the actual market has the card we're bidding on, before we bid on it.
-    Assertions.assertTrue(
-        gameStateResponse
-            .actualMarket()
-            .stream()
-            .map(PowerPlantCard::minimumAcceptableBid)
-            .collect(Collectors.toList())
-            .contains(2));
 
     gameStateMachine.performAuctionAction(auctionAction);
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_BIDDING);
