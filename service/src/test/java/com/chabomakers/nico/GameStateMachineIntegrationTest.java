@@ -319,7 +319,8 @@ public class GameStateMachineIntegrationTest {
         gameStateMachine.gameState().userPowerPlants();
     Assertions.assertEquals(userPowerPlants.get(player2Id).size(), 1);
 
-    // Verify: player 1 gets to start a new auction, since this is round 1.
+    // Verify: player 1 gets to start a new auction, since this is round 1 and
+    // they lost their last auction.
     gameStateResponse = gameStateMachine.gameState();
     Assertions.assertEquals(gameStateResponse.currentUser(), player1Id);
   }
