@@ -73,11 +73,28 @@ jacocoTestReport {
   }
 }
 
+task buildReactAssets(type: Exec) {
+  inputs.file("../frontend/yarn.lock")
+  inputs.dir("../frontend/src")
+  outputs.dir("../frontend/dist")
+  commandLine "./build_frontend.sh"
+}
+compileJava.dependsOn(buildReactAssets)
+
 docker {
   javaApplication {
     baseImage = "docker.artifactory.cloudkitchens.internal/jre8-grpc-probe:2.3.0"
     tag = "nico"
     ports = [8080, 5005]
+  }
+}
+
+// The JAR's resources should pull static resources from the frontend build.
+sourceSets {
+  main {
+    resources {
+      srcDirs "src/main/resources", "../frontend/dist"
+    }
   }
 }
 
