@@ -244,6 +244,10 @@ public class GameStateMachineImpl {
             .collect(Collectors.toList());
   }
 
+  private int majorGamePhase() {
+    return 1;
+  }
+
   private void initializeAuctionPhase() {
     playersWhoHaveWonAuctions = Sets.newHashSet();
     currentBidIndex = 0;
