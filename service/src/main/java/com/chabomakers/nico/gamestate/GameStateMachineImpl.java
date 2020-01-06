@@ -51,14 +51,14 @@ public class GameStateMachineImpl {
   private Map<UUID, Integer> userMoney = Maps.newHashMap();
 
   // Auction + Bidding state
-  private int auctionNumber = 0;
-  private List<UUID> playerOrder;
+  private List<UUID> userOrder;
   private int currentBidIndex;
   private Set<UUID> currentBidPassedUsers;
   private PowerPlantCard currentBidPlant;
   private Integer currentPowerPlantBid;
   private UUID highestBidUser;
-  private Set<UUID> playersWhoHaveWonAuctions = Sets.newHashSet();
+  private Set<UUID> usersWhoHaveWonAuctions = Sets.newHashSet();
+  private Set<UUID> usersWhoHaveStartedAuctions = Sets.newHashSet();
 
   // Resource buying state
   private int resourceBuyNumber;
@@ -88,9 +88,9 @@ public class GameStateMachineImpl {
         currentPowerPlantBid = action.bid();
         highestBidUser = action.userId();
         currentBidPlant = powerPlantMarket.getCard(action.choosePlantId());
-        currentBidIndex = (auctionNumber + 1) % users.size();
+        selectNextBidUser();
         gamePhase = AUCTION_BIDDING;
-        if (playersWhoCantBidInCurrentAuction().size() == playerOrder.size() - 1) {
+        if (playersWhoCantBidInCurrentAuction().size() == userOrder.size() - 1) {
           handleAllBiddersDone();
         }
       } else if (action.actionType() == PASS) {
@@ -118,7 +118,7 @@ public class GameStateMachineImpl {
           selectNextBidUser();
         } else if (action.actionType() == ActionType.PASS) {
           currentBidPassedUsers.add(currentUser);
-          if (playersWhoCantBidInCurrentAuction().size() == playerOrder.size() - 1) {
+          if (playersWhoCantBidInCurrentAuction().size() == userOrder.size() - 1) {
             handleAllBiddersDone();
           } else {
             // Let the next user have a shot at bidding.
@@ -138,13 +138,13 @@ public class GameStateMachineImpl {
     }
   }
 
-  private Collection<UserRow> getUsers() {
+  private Collection<UserRow> getPlayers() {
     return users.values();
   }
 
   private Set<UUID> playersWhoCantBidInCurrentAuction() {
     HashSet<UUID> uuids = Sets.newHashSet(currentBidPassedUsers);
-    uuids.addAll(playersWhoHaveWonAuctions);
+    uuids.addAll(usersWhoHaveWonAuctions);
     return uuids;
   }
 
@@ -152,20 +152,16 @@ public class GameStateMachineImpl {
   private void handleAllBiddersDone() {
     LOGGER.info("All user's but one has passed on the current auction.");
     gamePhase = AUCTION_PICK_PLANT;
-    if (gameRound == 0 && highestBidUser == currentPlantPickerUser()) {
-      auctionNumber = auctionNumber + 1;
-    } else {
-      LOGGER.info("User get's to pick another plant since they didn't win their first pick.");
-    }
     powerPlantMarket.removeCard(currentBidPlant);
     usersCards.get(highestBidUser).add(currentBidPlant);
-    playersWhoHaveWonAuctions.add(highestBidUser);
+    usersWhoHaveWonAuctions.add(highestBidUser);
     userMoney.put(highestBidUser, userMoney.get(highestBidUser) - currentPowerPlantBid);
     currentBidPlant = null;
     currentPowerPlantBid = null;
     highestBidUser = null;
     currentBidPassedUsers = Sets.newHashSet();
-    if (auctionNumber == playerOrder.size()) {
+    boolean userFoundToStartNextAuction = updateBidIndexAfterAuctionWon();
+    if (!userFoundToStartNextAuction) {
       gamePhase = BUYING_RESOURCES;
       resourceBuyNumber = 0;
     }
@@ -182,11 +178,11 @@ public class GameStateMachineImpl {
   }
 
   public GameStateResponse gameState() {
-    Collection<UserRow> userRows = getUsers();
+    Collection<UserRow> userRows = getPlayers();
     final List<User> users = userRows.stream().map(User::toUser).collect(Collectors.toList());
     return ImmutableGameStateResponse.builder()
         .addAllUsers(users)
-        .currentPlayerOrder(playerOrder)
+        .currentPlayerOrder(userOrder)
         .currentUser(currentUser())
         .actualMarket(powerPlantMarket.actualMarket())
         .futureMarket(powerPlantMarket.futureMarket())
@@ -210,7 +206,6 @@ public class GameStateMachineImpl {
   private UUID currentUser() {
     switch (gamePhase) {
       case AUCTION_PICK_PLANT:
-        return currentPlantPickerUser();
       case AUCTION_BIDDING:
         return currentBidUser();
       case BUYING_RESOURCES:
@@ -221,20 +216,53 @@ public class GameStateMachineImpl {
   }
 
   private UUID currentResourceBuyUser() {
-    return playerOrder.get(playerOrder.size() - 1 - resourceBuyNumber);
+    return userOrder.get(userOrder.size() - 1 - resourceBuyNumber);
   }
 
-  private UUID currentPlantPickerUser() {
-    return playerOrder.get(auctionNumber);
+  /**
+   * Updates the bid index to point to the user that should start an auction. If no such user can be
+   * found returns false.
+   */
+  private boolean updateBidIndexAfterAuctionWon() {
+    if (gameRound == 0) {
+      UUID playerWithoutWin =
+          userOrder
+              .stream()
+              .filter(playerUuid -> !usersWhoHaveWonAuctions.contains(playerUuid))
+              .findFirst()
+              .orElse(null);
+      if (playerWithoutWin == null) {
+        return false;
+      }
+      currentBidIndex = userOrder.indexOf(playerWithoutWin);
+    } else {
+      // TODO: need to test this logic thoroughly once we have the ability to test
+      //   multiple game rounds since this is totally different in the second game round.
+      UUID playerWithoutWin =
+          userOrder
+              .stream()
+              .filter(
+                  playerUuid ->
+                      !usersWhoHaveWonAuctions.contains(playerUuid)
+                          && !usersWhoHaveStartedAuctions.contains(playerUuid))
+              .findFirst()
+              .orElse(null);
+      if (playerWithoutWin == null) {
+        return false;
+      }
+      currentBidIndex = userOrder.indexOf(playerWithoutWin);
+    }
+    usersWhoHaveStartedAuctions.add(currentBidUser());
+    return true;
   }
 
   private UUID currentBidUser() {
-    return playerOrder == null ? null : playerOrder.get(currentBidIndex);
+    return userOrder == null ? null : userOrder.get(currentBidIndex);
   }
 
   private void assignUserOrder() {
     // Pick arbitrary order for users that have same amount of resources.
-    playerOrder =
+    userOrder =
         users
             .keySet()
             .stream()
@@ -245,7 +273,8 @@ public class GameStateMachineImpl {
   }
 
   private void initializeAuctionPhase() {
-    playersWhoHaveWonAuctions = Sets.newHashSet();
+    usersWhoHaveStartedAuctions = Sets.newHashSet();
+    usersWhoHaveWonAuctions = Sets.newHashSet();
     currentBidIndex = 0;
     currentBidPassedUsers = Sets.newHashSet();
     gamePhase = AUCTION_PICK_PLANT;
