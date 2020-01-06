@@ -12,11 +12,12 @@
     "react-dom": "^16.12.0",
     "react-scripts": "3.3.0",
     "reactstrap": "^8.2.0",
+    "yarn": "^1.21.1",
     "sfcookies": "^1.0.2"
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "yarn install && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

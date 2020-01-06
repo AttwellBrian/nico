@@ -4,4 +4,5 @@ Start the program with `./gradlew run` then you can attach a remote debugger to 
 
 Frontend Debugging
 -------
-You can run `npm start` from the frontend module. File watcher will cause automatic hot reloads.
+You can run `yarn start` from the frontend module. File watcher will cause automatic hot reloads.
+You may need to perform a `yarn install` the first time to pull in dependencies. 
