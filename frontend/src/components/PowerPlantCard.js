@@ -34,7 +34,7 @@ class PowerPlantCard extends React.Component {
       inputIconsArray.push("x");
     }
     inputIcons = inputIconsArray.map((input, index) => {
-      return <div className={mainCardStyle + "Input input"}></div>;
+      return <div key={index} className={mainCardStyle + "Input input"}></div>;
     });
 
     return (

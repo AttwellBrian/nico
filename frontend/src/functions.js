@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as constants from "./constants";
-import { bake_cookie, read_cookie, delete_cookie } from "sfcookies";
+import { bake_cookie, delete_cookie } from "sfcookies";
 
 function pyth(x, y) {
   if (typeof x !== "number" || typeof y !== "number") return false;
@@ -288,7 +288,9 @@ function apiAuctionAction(actionType, userId, plantId, bid) {
   axios
     // get data from server
     .post(constants.serverURL + "/auction/act", auctionData)
-    .then(data => {});
+    .then(data => {
+      console.log(data);
+    });
 }
 
 function resetPlayers(that) {
