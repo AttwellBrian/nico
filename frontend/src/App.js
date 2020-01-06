@@ -4,6 +4,7 @@ import mainMapImage from "./assets/images/usmap-background.jpg";
 import City from "./components/City";
 import PowerPlantMarket from "./components/PowerPlantMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
+import CurrentPlayer from "./components/CurrentPlayer";
 import Login from "./components/Login";
 import * as tools from "./functions";
 import * as constants from "./constants";
@@ -14,6 +15,7 @@ class App extends React.Component {
     this.state = constants.emptyClientGameStateSchema;
     this.toggleShowPowerPlantModal = this.toggleShowPowerPlantModal.bind(this);
     this.addRemoveSelectedCity = this.addRemoveSelectedCity.bind(this);
+    this.handleReset = this.handleReset.bind(this);
   }
 
   toggleShowPowerPlantModal() {
@@ -32,6 +34,10 @@ class App extends React.Component {
       selectedCities.splice(targetIndex, 1);
     }
   };
+
+  handleReset() {
+    tools.resetPlayers(this);
+  }
 
   componentDidUpdate() {}
 
@@ -106,7 +112,16 @@ class App extends React.Component {
         <Login parent={this} gameState={this.state.gameState} />
         {this.state.showGame === true && (
           <div>
-            <div className="topBar"></div>
+            <div className="topBar">
+              <div className="endGameButton" onClick={this.handleReset}>
+                End Game
+              </div>
+              <CurrentPlayer
+                currentPlayer={this.state.gameState.currentPlayer}
+                userProfile={this.state.userProfile}
+                players={this.state.gameState.players}
+              />
+            </div>
             <div className="resourcesContainer">
               <div className="containerTitle">Resources Market</div>
             </div>

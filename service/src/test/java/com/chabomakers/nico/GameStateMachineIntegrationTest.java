@@ -1,5 +1,7 @@
 package com.chabomakers.nico;
 
+import static com.chabomakers.nico.gamestate.GameStateMachine.GamePhase.BUYING_RESOURCES;
+
 import com.chabomakers.nico.controllers.GameStateResponse;
 import com.chabomakers.nico.gamestate.AuctionAction.ActionType;
 import com.chabomakers.nico.gamestate.GameStateMachine;
@@ -10,7 +12,6 @@ import com.google.common.truth.Truth;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,14 +57,6 @@ public class GameStateMachineIntegrationTest {
             .userId(player1Id)
             .choosePlantId(secondPowerPlantCard.id())
             .build();
-    // Assert that the actual market has the card we're bidding on, before we bid on it.
-    Assertions.assertTrue(
-        gameStateResponse
-            .actualMarket()
-            .stream()
-            .map(PowerPlantCard::minimumAcceptableBid)
-            .collect(Collectors.toList())
-            .contains(2));
 
     gameStateMachine.performAuctionAction(auctionAction);
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_BIDDING);
@@ -185,14 +178,6 @@ public class GameStateMachineIntegrationTest {
             .userId(player1Id)
             .choosePlantId(powerPlantCard.id())
             .build();
-    // Assert that the actual market has the card we're bidding on, before we bid on it.
-    Assertions.assertTrue(
-        gameStateResponse
-            .actualMarket()
-            .stream()
-            .map(PowerPlantCard::minimumAcceptableBid)
-            .collect(Collectors.toList())
-            .contains(2));
 
     gameStateMachine.performAuctionAction(auctionAction);
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_BIDDING);
@@ -234,7 +219,7 @@ public class GameStateMachineIntegrationTest {
   }
 
   @Test
-  void auction_secondUserWins() {
+  void auction_secondUserWinsFirstUsersAuction() {
     gameStateMachine.createUser("user1", "red");
     gameStateMachine.createUser("user2", "blue");
     gameStateMachine.createUser("user3", "green");
@@ -264,14 +249,6 @@ public class GameStateMachineIntegrationTest {
             .userId(player1Id)
             .choosePlantId(secondPowerPlantCard.id())
             .build();
-    // Assert that the actual market has the card we're bidding on, before we bid on it.
-    Assertions.assertTrue(
-        gameStateResponse
-            .actualMarket()
-            .stream()
-            .map(PowerPlantCard::minimumAcceptableBid)
-            .collect(Collectors.toList())
-            .contains(2));
 
     gameStateMachine.performAuctionAction(auctionAction);
     Assertions.assertEquals(gameStateMachine.gamePhase(), GamePhase.AUCTION_BIDDING);
@@ -316,5 +293,60 @@ public class GameStateMachineIntegrationTest {
     Map<UUID, List<PowerPlantCard>> userPowerPlants =
         gameStateMachine.gameState().userPowerPlants();
     Assertions.assertEquals(userPowerPlants.get(player2Id).size(), 1);
+
+    // Verify: player 1 gets to start a new auction, since this is round 1 and
+    // they lost their last auction.
+    gameStateResponse = gameStateMachine.gameState();
+    Assertions.assertEquals(gameStateResponse.currentUser(), player1Id);
+  }
+
+  @Test
+  void auction_skipPreviouslyWonUser() {
+    auction_secondUserWinsFirstUsersAuction();
+
+    GameStateResponse gameStateResponse = gameStateMachine.gameState();
+    Assertions.assertEquals(gameStateResponse.gamePhase(), GamePhase.AUCTION_PICK_PLANT);
+
+    UUID player1Id = gameStateResponse.currentPlayerOrder().get(0);
+    UUID player3Id = gameStateResponse.currentPlayerOrder().get(2);
+
+    PowerPlantCard powerPlantCard = gameStateResponse.actualMarket().get(0);
+    ImmutableAuctionAction auctionAction =
+        ImmutableAuctionAction.builder()
+            .actionType(ActionType.CHOOSE_PLANT)
+            .bid(10)
+            .userId(player1Id)
+            .choosePlantId(powerPlantCard.id())
+            .build();
+    gameStateMachine.performAuctionAction(auctionAction);
+
+    // Verify that we skip the second user, since they won the last auction.
+    gameStateResponse = gameStateMachine.gameState();
+    Truth.assertThat(gameStateResponse.currentUser()).isEqualTo(player3Id);
+
+    auctionAction =
+        ImmutableAuctionAction.builder().actionType(ActionType.PASS).userId(player3Id).build();
+    gameStateMachine.performAuctionAction(auctionAction);
+    Truth.assertThat(gameStateMachine.gameState().userWithHighestPowerplantBid()).isNull();
+
+    // Verify the first user wins the auction. The only remaining auction user should be user 3.
+    gameStateResponse = gameStateMachine.gameState();
+    Truth.assertThat(gameStateResponse.currentUser()).isEqualTo(player3Id);
+    Map<UUID, List<PowerPlantCard>> userPowerPlants =
+        gameStateMachine.gameState().userPowerPlants();
+    Truth.assertThat(userPowerPlants.get(player1Id)).containsExactly(powerPlantCard);
+
+    powerPlantCard = gameStateResponse.actualMarket().get(0);
+    auctionAction =
+        ImmutableAuctionAction.builder()
+            .actionType(ActionType.CHOOSE_PLANT)
+            .bid(10)
+            .userId(player3Id)
+            .choosePlantId(powerPlantCard.id())
+            .build();
+    gameStateMachine.performAuctionAction(auctionAction);
+
+    // Verify: we've finished all auctions.
+    Truth.assertThat(gameStateMachine.gameState().gamePhase()).isEqualTo(BUYING_RESOURCES);
   }
 }

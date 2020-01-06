@@ -1,5 +1,6 @@
 import axios from "axios";
 import * as constants from "./constants";
+import { bake_cookie, read_cookie, delete_cookie } from "sfcookies";
 
 function pyth(x, y) {
   if (typeof x !== "number" || typeof y !== "number") return false;
@@ -191,7 +192,12 @@ function apiUpdateState(that) {
     let translatedState = translateState(data.data);
     // CALLBACK CHECKS
 
-    // 1. Check to see if we are entering auctionPickPlant so we can pop the modal up
+    // 1. Check to see if game is reset, in which case delete the cookie
+    if (typeof that.state.gameState.players === "undefined") {
+      delete_cookie("user");
+    }
+
+    // 2. Check to see if we are entering auctionPickPlant so we can pop the modal up
     if (
       translatedState.gamePhase !== "auctionPickPlant" &&
       translatedState.gamePhase === "auctionPickPlant" &&
@@ -238,22 +244,38 @@ function apiCreateUser(player, loginScreen, parent) {
         player.color
     )
     .then(data => {
-      // hide the login screen
-      loginScreen.setState({ show: false });
+      // translate user profile
+      const userProfile = {
+        name: data.data.user.name,
+        uuid: data.data.user.id,
+        color: data.data.user.color
+      };
+      // create cookie
+      bake_cookie("user", userProfile);
+      // set the client-side user profile
       parent.setState({
-        // set the client-side user profile
-        userProfile: {
-          name: player.name,
-          uuid: data.data.user.id,
-          color: player.color
-        },
-        // show game screen
-        showGame: true
+        userProfile: userProfile
       });
     });
 }
 
-function apiStartGame() {}
+function apiStartGame(loginScreen, parent) {
+  axios
+    // get data from server
+    .post(constants.serverURL + "/startgame")
+    .then(data => {
+      // hide the login screen
+      loginScreen.setState({ show: false });
+      parent.setState(
+        {
+          showGame: true
+        },
+        () => {
+          apiUpdateState(parent);
+        }
+      );
+    });
+}
 
 function apiAuctionAction() {
   // note for format later: {"userId":"d108e378-ee12-441a-bc3a-524db44a4529","actionType":"CHOOSE_PLANT", "choosePlantId":"b182b03f-b23c-463e-8f6c-0abe063c1aa2", "bid": 1}
@@ -266,10 +288,16 @@ function bidOnPowerPlant(userId, plantId) {
 
 function resetPlayers(that) {
   axios
-    // get data from server
+    // reset the server
     .post(constants.serverURL + "/reset")
     .then(data => {
-      apiUpdateState(that);
+      // delete the user
+      delete_cookie("user");
+      // reset local state
+      that.setState(constants.emptyClientGameStateSchema, () => {
+        // reseed from server state
+        apiUpdateState(that);
+      });
     });
 }
 
