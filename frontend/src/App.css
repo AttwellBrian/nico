@@ -64,6 +64,8 @@ h6 {
 }
 
 .loginBox {
+  width: 420px;
+  height: 500px;
   background-color: rgba(0, 0, 0, 0.8);
   color: #fff;
   float: left;
@@ -115,18 +117,8 @@ h6 {
 }
 
 .existingPlayer {
-  margin-top: 15px;
-  border: solid 1px #333;
-  float: left;
-  padding: 5px;
   margin-right: 10px;
-  margin-bottom: 20px;
-}
-
-.existingPlayer:hover {
-  cursor: pointer;
-  border: solid 1px #ffea00;
-  color: #ffea00;
+  margin-bottom: 15px;
 }
 
 .existingPlayerReset {
@@ -140,6 +132,37 @@ h6 {
 .existingPlayerReset:hover {
   cursor: pointer;
   color: #ffea00;
+}
+
+.startGameButton {
+  border: solid 1px #ccc;
+  width: 150px;
+  padding: 10px;
+  text-align: center;
+  border-radius: 5px;
+}
+
+.startGameButton:hover {
+  cursor: pointer;
+  color: #ffea00;
+  border-color: #ffea00;
+}
+
+.endGameButton {
+  border: solid 1px #ccc;
+  width: 100px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 5px;
+  color: #ccc;
+  margin-top: 8px;
+  margin-left: 10px;
+}
+
+.endGameButton:hover {
+  cursor: pointer;
+  color: red;
+  border-color: red;
 }
 
 .submitButton {
@@ -526,4 +549,11 @@ h6 {
   font-weight: bolder;
   text-shadow: -1px -1px 0 #fff, 0 -1px 0 #fff, 1px -1px 0 #fff, 1px 0 0 #fff,
     1px 1px 0 #fff, 0 1px 0 #fff, -1px 1px 0 #fff, -1px 0 0 #fff;
+}
+
+.currentPlayer {
+  color: #fff;
+  margin-top: 12px;
+  float: right;
+  margin-right: 20px;
 }

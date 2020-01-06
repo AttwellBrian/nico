@@ -1,16 +1,24 @@
 import React from "react";
 import * as tools from "../functions";
+import { read_cookie } from "sfcookies";
 
 class Login extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { name: "", color: "", selectedOption: "", show: true };
+    this.state = {
+      name: "",
+      color: "",
+      selectedOption: "",
+      show: true,
+      submitted: false
+    };
 
     this.handleChange = this.handleChange.bind(this);
     this.handleColor = this.handleColor.bind(this);
     this.handleExistingPlayer = this.handleExistingPlayer.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
     this.handleReset = this.handleReset.bind(this);
+    this.handleStartGame = this.handleStartGame.bind(this);
   }
 
   handleChange(event) {
@@ -35,6 +43,13 @@ class Login extends React.Component {
 
   handleReset() {
     tools.resetPlayers(this.props.parent);
+    this.setState({
+      submitted: false
+    });
+  }
+
+  handleStartGame() {
+    tools.apiStartGame(this, this.props.parent);
   }
 
   handleSubmit(event) {
@@ -49,8 +64,58 @@ class Login extends React.Component {
       this,
       this.props.parent
     );
+    this.setState({
+      submitted: true
+    });
     event.preventDefault();
   }
+
+  componentDidUpdate() {
+    // manage cookies
+    let userCookie = read_cookie("user");
+
+    // set the userProfile from cookie and then bring user to either lobby pt.2 or to the game
+    if (typeof userCookie.uuid !== "undefined") {
+      if (this.props.parent.state.userProfile.name === "") {
+        this.props.parent.setState({
+          userProfile: userCookie
+        });
+      }
+      if (this.props.parent.state.gameState.gamePhase === "lobby") {
+        if (!this.state.submitted) {
+          this.setState({
+            submitted: true
+          });
+        }
+      } else if (this.props.parent.state.gameState.gamePhase !== "") {
+        if (this.state.show) {
+          this.setState({ show: false });
+        }
+        if (!this.props.parent.state.showGame) {
+          this.props.parent.setState({
+            showGame: true
+          });
+        }
+      }
+    } else {
+      // if no cookie exists (or if cookie recently got removed) go back to lobby pt.1
+      if (this.state.submitted) {
+        this.setState({
+          submitted: false
+        });
+      }
+      if (!this.state.show) {
+        this.setState({ show: true });
+      }
+      if (this.props.parent.state.showGame) {
+        this.props.parent.setState({
+          showGame: false
+        });
+      }
+    }
+  }
+
+  componentDidMount() {}
 
   render() {
     var showLoginClassName = "loginPage";
@@ -81,65 +146,81 @@ class Login extends React.Component {
       }
     }
 
+    // if color selected is no longer available, reset the color state
+    if (
+      !colorsAvailable.includes(this.state.color) &&
+      this.state.color !== ""
+    ) {
+      this.setState({ color: "" });
+    }
+
     return (
       <div className={showLoginClassName}>
         <div className="loginBox">
           <div className="logo">Powergrid</div>
-          <form onSubmit={this.handleSubmit}>
-            <label>
-              <div className="labelName">Your Company Name:</div>
-              <input
-                className="inputName"
-                type="text"
-                value={this.state.name}
-                onChange={this.handleChange}
-              />
-            </label>
-            <br />
-            <div className="rocketSelection">
-              {colorsAvailable.map(color => (
-                <label key={color}>
-                  <div key={color} className={color}>
-                    <input
-                      type="radio"
-                      name={color}
-                      value={color}
-                      onChange={this.handleColor}
-                      checked={this.state.color === color}
-                    />
+          {!this.state.submitted && (
+            <form onSubmit={this.handleSubmit}>
+              <label>
+                <div className="labelName">Your Company Name:</div>
+                <input
+                  className="inputName"
+                  type="text"
+                  value={this.state.name}
+                  onChange={this.handleChange}
+                />
+              </label>
+              <br />
+              <div className="rocketSelection">
+                {colorsAvailable.map(color => (
+                  <label key={color}>
+                    <div key={color} className={color}>
+                      <input
+                        type="radio"
+                        name={color}
+                        value={color}
+                        onChange={this.handleColor}
+                        checked={this.state.color === color}
+                      />
+                    </div>
+                  </label>
+                ))}
+              </div>
+
+              <div className="submitButton">
+                <input
+                  className="submitButtonButton"
+                  type="submit"
+                  value="Join Game"
+                  disabled={this.state.color === ""}
+                />
+              </div>
+            </form>
+          )}
+
+          {this.state.submitted && (
+            <div>
+              <div className="existingPlayers">
+                <h4>Players in Lobby</h4>
+                {playersArray.map((player, index) => (
+                  <div key={index} className="existingPlayer">
+                    {player.name}
                   </div>
-                </label>
-              ))}
-            </div>
-            <div className="existingPlayers">
-              {playersArray.map((player, index) => (
-                <div
-                  key={index}
-                  className="existingPlayer"
-                  onClick={() => {
-                    this.handleExistingPlayer(player);
-                  }}
-                >
-                  {player.name}
-                </div>
-              ))}
-              <div
-                className="existingPlayerReset"
-                onClick={() => {
-                  this.handleReset();
-                }}
-              >
-                Reset
+                ))}
+              </div>
+              <div className="startGameButton" onClick={this.handleStartGame}>
+                Start Game
               </div>
             </div>
-            <div className="submitButton">
-              <input
-                className="submitButtonButton"
-                type="submit"
-                value="Join Game"
-              />
-            </div>
-          </form>
+          )}
+
+          <div
+            className="existingPlayerReset"
+            onClick={() => {
+              this.handleReset();
+            }}
+          >
+            Reset
+          </div>
         </div>
       </div>
     );
