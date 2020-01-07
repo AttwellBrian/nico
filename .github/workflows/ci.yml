@@ -13,18 +13,20 @@ jobs:
       uses: actions/setup-java@v1
       with:
         java-version: 1.8
-    - uses: GoogleCloudPlatform/github-actions/setup-gcloud@master        
+      
+    - name: Setup gcloud CLI using service account key
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '270.0.0'
+        service_account_email: github-releaser@nico-264204.iam.gserviceaccount.com
+        service_account_key: ${{ secrets.deployer_service_account }}
         
     - name: Build with Gradle
       run: ./gradlew :service:dockerBuildImage
       
     - name: Deploy Container
-      env:
-          DEPLOYER_SERVICE_KEY: ${{ secrets.deployer_service_account }}
       run: |
-        echo $DEPLOYER_SERVICE_KEY > temp_secret.json
-        gcloud auth activate-service-account github-releaser@nico-264204.iam.gserviceaccount.com --key-file=temp_secret.json --project=nico-264204
+        gcloud config set project nico-264204
         docker tag nico gcr.io/nico-264204/nico-service:latest
         docker push gcr.io/nico-264204/nico-service:latest
         gcloud beta run deploy nico-service --image gcr.io/nico-264204/nico-service:latest --region us-central1 --platform managed
-        rm -rf temp_secret.json
