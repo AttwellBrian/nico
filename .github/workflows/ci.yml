@@ -22,8 +22,9 @@ jobs:
       env:
           DEPLOYER_SERVICE_KEY: ${{ secrets.deployer_service_account }}
       run: |
-        echo $DEPLOYER_SERVICE_KEY
-        gcloud auth activate-service-account github-releaser@nico-264204.iam.gserviceaccount.com --key-file=/Users/brian.attwell/Downloads/nico-264204-a83bccbf69b8.json --project=nico-264204
+        echo $DEPLOYER_SERVICE_KEY > temp_secret.json
+        gcloud auth activate-service-account github-releaser@nico-264204.iam.gserviceaccount.com --key-file=temp_secret.json --project=nico-264204
         docker tag nico gcr.io/nico-264204/nico-service:latest
         docker push gcr.io/nico-264204/nico-service:latest
         gcloud beta run deploy nico-service --image gcr.io/nico-264204/nico-service:latest --region us-central1 --platform managed
+        rm -rf temp_secret.json
