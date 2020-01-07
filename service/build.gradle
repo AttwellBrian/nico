@@ -84,14 +84,17 @@ compileJava.dependsOn(buildReactAssets)
 
 docker {
   javaApplication {
-    // This will fail unless you first build the base docker, or are running in a
-    // network where gcr.io/nico-264204/nico_jre8_base:latest is already available.
-    // See the docker-base/ directory for how to build this.
-    baseImage = "gcr.io/nico-264204/nico_jre8_base:latest"
+    baseImage = "nico_jre8_base:latest"
     tag = "nico"
     ports = [8080, 5005]
   }
 }
+task buildDockerBase(type: Exec) {
+  inputs.dir("../docker-base")
+  commandLine "../docker-base/build_base_docker.sh"
+}
+dockerBuildImage.dependsOn(buildDockerBase)
+
 
 // The JAR's resources should pull static resources from the frontend build.
 sourceSets {
