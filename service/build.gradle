@@ -75,6 +75,7 @@ jacocoTestReport {
 
 task buildReactAssets(type: Exec) {
   inputs.file("../frontend/yarn.lock")
+  inputs.file("../frontend/package.json")
   inputs.dir("../frontend/src")
   outputs.dir("../frontend/dist")
   commandLine "./build_frontend.sh"

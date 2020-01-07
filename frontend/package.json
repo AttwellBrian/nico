@@ -17,7 +17,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "yarn install && react-scripts build",
+    "build": "yarn install && react-scripts build && rm -rf dist && mkdir -p dist && cp -r build/ dist/release",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
