@@ -30,4 +30,5 @@ jobs:
         docker tag nico gcr.io/nico-264204/nico-service:latest
         gcloud auth configure-docker
         docker push gcr.io/nico-264204/nico-service:latest
+        gcloud components install beta
         gcloud beta run deploy nico-service --image gcr.io/nico-264204/nico-service:latest --region us-central1 --platform managed
