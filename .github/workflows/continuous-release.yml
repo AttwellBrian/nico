@@ -21,14 +21,17 @@ jobs:
         service_account_email: github-releaser@nico-264204.iam.gserviceaccount.com
         service_account_key: ${{ secrets.deployer_service_account }}
         
+    - name: Configure Google Project + Docker
+      run: |
+        gcloud config set project nico-264204
+        gcloud auth configure-docker
+        
     - name: Build with Gradle
       run: ./gradlew :service:dockerBuildImage
       
     - name: Deploy Container
       run: |
-        gcloud config set project nico-264204
         docker tag nico gcr.io/nico-264204/nico-service:latest
-        gcloud auth configure-docker
         docker push gcr.io/nico-264204/nico-service:latest
         gcloud components install beta
         gcloud beta run deploy nico-service --image gcr.io/nico-264204/nico-service:latest --region us-central1 --platform managed
