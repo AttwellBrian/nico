@@ -1,0 +1,39 @@
+##
+## A nice jre8 docker file.
+##
+
+# use multistage build to pull in desired JRE and JDK components (https://docs.docker.com/develop/develop-images/multistage-build/)
+FROM openjdk:8u232-jre-stretch AS JRE
+FROM openjdk:8u232-jdk-stretch as JDK
+FROM gcr.io/cloud-marketplace-containers/google/debian9@sha256:026e2a4b7bbb36a6add6b2e7b4be10a2706ee59aa3f2e25b550277c9a8d82a6d
+
+# Pull the JRE directly from the OpenJDK JRE base image.
+COPY --from=JRE /usr/local/openjdk-8 /usr/local/openjdk-8
+
+# Copy in the JDK tools.jar (18MB), which contains Java runtime analysis tools.
+COPY --from=JDK /usr/local/openjdk-8/lib/tools.jar /usr/local/openjdk-8/lib/tools.jar
+
+# Copy in libattach.so (16K), needed by tools that attach to running Java processes, such as jmap and jstack.
+COPY --from=JDK /usr/local/openjdk-8/jre/lib/amd64/libattach.so /usr/local/openjdk-8/lib/amd64/libattach.so
+
+# Copy jmap, jcmd, jstack, jhat, jinfo, and jstat (8.9K each)
+# https://docs.oracle.com/javase/8/docs/technotes/tools/unix/intro.html
+ARG BIN_PATH=/usr/local/openjdk-8/bin
+COPY --from=JDK $BIN_PATH/jcmd $BIN_PATH/jhat $BIN_PATH/jinfo $BIN_PATH/jmap $BIN_PATH/jstack $BIN_PATH/jstat $BIN_PATH/
+
+ENV JAVA_HOME /usr/local/openjdk-8
+ENV PATH $JAVA_HOME/bin:$PATH
+
+# Add a minimal set of tools useful for runtime debugging.
+# - curl (14M)
+# - iputils-ping (0M): ping
+# - procps (1M): ps
+# - socat (1M): various socket operations
+# - knot-dnsutils (2M): dig / nslookup
+RUN apt-get update && \
+ apt-get install -y --no-install-recommends \
+ curl iputils-ping procps socat knot-dnsutils && \
+ apt-get upgrade -y && \
+ apt-get clean -y && \
+ rm -rf /var/cache/debconf/* /var/lib/apt/lists/* \
+ /var/log/* /tmp/* /var/tmp/*

@@ -84,11 +84,17 @@ compileJava.dependsOn(buildReactAssets)
 
 docker {
   javaApplication {
-    baseImage = "docker.artifactory.cloudkitchens.internal/jre8-grpc-probe:2.3.0"
+    baseImage = "nico_jre8_base:latest"
     tag = "nico"
     ports = [8080, 5005]
   }
 }
+task buildDockerBase(type: Exec) {
+  inputs.dir("../docker-base")
+  commandLine "./docker-base/build_base_docker.sh"
+}
+buildDockerBase.dependsOn(buildDockerBase)
+
 
 // The JAR's resources should pull static resources from the frontend build.
 sourceSets {
