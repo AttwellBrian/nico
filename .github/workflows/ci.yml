@@ -18,7 +18,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew :service:dockerBuildImage
       
-    - name: Build with Gradle
+    - name: Deploy Container
       env:
           DEPLOYER_SERVICE_KEY: ${{ secrets.deployer_service_account }}
       run: |
