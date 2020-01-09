@@ -12,7 +12,12 @@ class PowerPlantCard extends React.Component {
   componentDidUpdate() {}
 
   handleStartBid() {
-    tools.bidOnPowerPlant(this.props.userId, this.props.plantId);
+    tools.apiAuctionAction(
+      "CHOOSE_PLANT",
+      this.props.userId,
+      this.props.plantId,
+      this.props.cost
+    );
   }
 
   render() {
@@ -29,36 +34,38 @@ class PowerPlantCard extends React.Component {
       inputIconsArray.push("x");
     }
     inputIcons = inputIconsArray.map((input, index) => {
-      return <div className={mainCardStyle + "Input input"}></div>;
+      return <div key={index} className={mainCardStyle + "Input input"}></div>;
     });
 
     return (
-      <div className={mainCardStyle + " ppContainer"}>
-        <Card className={"ppCard " + mainCardStyle + "Card"}>
-          <CardBody>
-            {this.props.clickable === true && (
-              <div>
-                <Button onClick={this.handleStartBid}>
-                  Bid: ${this.props.cost}
-                </Button>
+      <div>
+        <div className={mainCardStyle + " ppContainer"}>
+          <Card className={"ppCard " + mainCardStyle + "Card"}>
+            <CardBody>
+              <div className="cost">{this.props.cost}</div>
+              <div className={"bottomBar " + mainCardStyle}>
+                <Row className="text-center">
+                  <Col xs="6">
+                    <div className="inputContainer">{inputIcons}</div>
+                  </Col>
+                  <Col xs="3">
+                    <div className="inputContainer ppPowers"></div>
+                  </Col>
+                  <Col xs="3">
+                    <div className="output">{this.props.output}</div>
+                  </Col>
+                </Row>
               </div>
-            )}
-            <div className="cost">{this.props.cost}</div>
-            <div className={"bottomBar " + mainCardStyle}>
-              <Row className="text-center">
-                <Col xs="6">
-                  <div className="inputContainer">{inputIcons}</div>
-                </Col>
-                <Col xs="3">
-                  <div className="inputContainer ppPowers"></div>
-                </Col>
-                <Col xs="3">
-                  <div className="output">{this.props.output}</div>
-                </Col>
-              </Row>
-            </div>
-          </CardBody>
-        </Card>
+            </CardBody>
+          </Card>
+        </div>
+        {this.props.clickable === true && (
+          <div>
+            <Button onClick={this.handleStartBid}>
+              Bid: ${this.props.cost}
+            </Button>
+          </div>
+        )}
       </div>
     );
   }

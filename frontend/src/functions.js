@@ -277,13 +277,28 @@ function apiStartGame(loginScreen, parent) {
     });
 }
 
-function apiAuctionAction() {
-  // note for format later: {"userId":"d108e378-ee12-441a-bc3a-524db44a4529","actionType":"CHOOSE_PLANT", "choosePlantId":"b182b03f-b23c-463e-8f6c-0abe063c1aa2", "bid": 1}
-}
-
 // API CALLS
-function bidOnPowerPlant(userId, plantId) {
-  alert(userId + " bid on power plant " + plantId);
+function apiAuctionAction(actionType, userId, plantId, bid) {
+  const auctionData = {
+    actionType: actionType,
+    userId: userId,
+    choosePlantId: plantId,
+    bid: bid
+  };
+  const axiosConfig = {
+    headers: {
+      // Only certain types qualify as "Simple requests" (and thus do not require the preflight request).
+      // Used for local dev setup. This is needed for local dev setup.
+      // See https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests
+      'Content-Type': "text/plain"
+    }
+  };
+  axios
+    // get data from server
+    .post(constants.serverURL + "/auction/act", auctionData, axiosConfig)
+    .then(data => {
+      console.log(data);
+    });
 }
 
 function resetPlayers(that) {
@@ -311,7 +326,6 @@ export {
   generateMap,
   apiUpdateState,
   apiUpdateStateInterval,
-  bidOnPowerPlant,
   resetPlayers,
   newPlayer,
   apiCreateUser,
