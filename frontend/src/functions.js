@@ -1,6 +1,6 @@
 import axios from "axios";
 import * as constants from "./constants";
-import { bake_cookie, delete_cookie } from "sfcookies";
+import { bake_cookie, read_cookie, delete_cookie } from "sfcookies";
 
 function pyth(x, y) {
   if (typeof x !== "number" || typeof y !== "number") return false;
@@ -285,9 +285,17 @@ function apiAuctionAction(actionType, userId, plantId, bid) {
     choosePlantId: plantId,
     bid: bid
   };
+  const axiosConfig = {
+    headers: {
+      // Only certain types qualify as "Simple requests" (and thus do not require the preflight request).
+      // Used for local dev setup. This is needed for local dev setup.
+      // See https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests
+      'Content-Type': "text/plain"
+    }
+  };
   axios
     // get data from server
-    .post(constants.serverURL + "/auction/act", auctionData)
+    .post(constants.serverURL + "/auction/act", auctionData, axiosConfig)
     .then(data => {
       console.log(data);
     });

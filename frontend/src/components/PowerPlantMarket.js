@@ -46,7 +46,7 @@ class PowerPlantMarket extends React.Component {
       return (
         <Col key={index}>
           <PowerPlantCard
-            plantId={plant}
+            plantId={plant.id}
             userId={userProfile.uuid}
             cost={plant.cost}
             type={plant.type}
