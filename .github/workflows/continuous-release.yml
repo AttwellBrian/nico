@@ -1,0 +1,40 @@
+name: Build and release server to prod
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up JDK 1.8
+      uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+      
+    - name: Setup gcloud CLI using service account key
+      uses: GoogleCloudPlatform/github-actions/setup-gcloud@master
+      with:
+        version: '270.0.0'
+        service_account_email: github-releaser@nico-264204.iam.gserviceaccount.com
+        service_account_key: ${{ secrets.deployer_service_account }}
+        
+    - name: Configure Google Project + Docker
+      run: |
+        gcloud config set project nico-264204
+        gcloud auth configure-docker
+        
+    - name: Build with Gradle
+      run: ./gradlew :service:dockerBuildImage
+      
+    - name: Deploy Container
+      run: |
+        docker tag nico gcr.io/nico-264204/nico-service:latest
+        docker push gcr.io/nico-264204/nico-service:latest
+        gcloud components install beta
+        gcloud beta run deploy nico-service --image gcr.io/nico-264204/nico-service:latest --region us-central1 --platform managed

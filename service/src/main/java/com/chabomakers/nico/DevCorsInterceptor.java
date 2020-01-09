@@ -19,7 +19,7 @@ class DevCorsInterceptor extends Interceptor {
     if (request.host().startsWith("localhost:")) {
       response.header("Access-Control-Allow-Headers", "*");
       response.header("Access-Control-Allow-Origin", "*");
-      response.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE");
+      response.header("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, ACCEPT");
       response.header("Access-Control-Allow-Credentials", "*");
     }
   }
