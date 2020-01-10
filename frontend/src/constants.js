@@ -1,4 +1,4 @@
-const serverURL = "http://localhost:8080";
+const serverURL = process.env.REACT_APP_STAGE === "prod" ? "https://nico-service-pwe5kqqlfa-uc.a.run.app" : "http://localhost:8080";
 
 const emptyGameStateSchema = {
   players: {},
