@@ -149,6 +149,7 @@ h6 {
 }
 
 .endGameButton {
+  float: left;
   border: solid 1px #ccc;
   width: 100px;
   padding: 5px;
@@ -369,7 +370,7 @@ h6 {
 
 .userContainer {
   width: 100%;
-  height: 150px;
+  height: 250px;
   background-color: rgba(0, 0, 0, 0.6);
   position: fixed;
   bottom: 0;
@@ -406,6 +407,7 @@ h6 {
   border: solid 1px #333;
   border-radius: 10px;
   padding: 10px;
+  width: 180px;
 }
 
 .ppContainer .card {
@@ -556,4 +558,60 @@ h6 {
   margin-top: 12px;
   float: right;
   margin-right: 20px;
+}
+
+.bidComponent {
+  width: 150px;
+  margin: 10px auto;
+}
+
+.bidComponent .row,
+.bidComponent .col {
+  padding: 0px;
+  margin: 0px;
+}
+
+.bidInput {
+  font-size: 25px;
+  border: solid 1px #eee;
+  border-radius: 5px;
+  padding: 2px 8px;
+  margin-right: 5px;
+  margin-top: 5px;
+  color: #fff;
+  background-color: #14ac00;
+}
+
+.bidInput:hover {
+  cursor: pointer;
+  background-color: #055005;
+}
+
+.bidButton {
+  width: 100%;
+  font-size: 12px;
+  border: solid 1px #ccc;
+  border-radius: 5px;
+  padding: 2px 8px;
+  margin-bottom: 5px;
+}
+
+.bidDisabled {
+  width: 100%;
+  font-size: 12px;
+  border: solid 1px #ccc;
+  border-radius: 5px;
+  padding: 2px 8px;
+  margin-bottom: 5px;
+  opacity: 0.2;
+}
+
+.bidButton:hover {
+  cursor: pointer;
+  background-color: #055005;
+  color: #fff;
+}
+
+.ownedPlantsRow {
+  margin-left: 5px;
 }

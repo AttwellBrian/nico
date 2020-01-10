@@ -23,6 +23,7 @@ const emptyClientGameStateSchema = {
   gameState: emptyGameStateSchema,
   showGame: false,
   showPowerPlantMarket: false,
+  showResourcesMarket: false,
   highestBidder: "",
   selectedCities: [],
   costToPurchaseCities: 0

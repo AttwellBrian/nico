@@ -3,8 +3,11 @@ import "./App.css";
 import mainMapImage from "./assets/images/usmap-background.jpg";
 import City from "./components/City";
 import PowerPlantMarket from "./components/PowerPlantMarket";
+import ResourcesMarket from "./components/ResourcesMarket";
 import ConnectionPipe from "./components/ConnectionPipe";
 import CurrentPlayer from "./components/CurrentPlayer";
+import PlayersTray from "./components/PlayersTray";
+
 import Login from "./components/Login";
 import * as tools from "./functions";
 import * as constants from "./constants";
@@ -14,6 +17,7 @@ class App extends React.Component {
     super(props);
     this.state = constants.emptyClientGameStateSchema;
     this.toggleShowPowerPlantModal = this.toggleShowPowerPlantModal.bind(this);
+    this.toggleShowResourcesModal = this.toggleShowResourcesModal.bind(this);
     this.addRemoveSelectedCity = this.addRemoveSelectedCity.bind(this);
     this.handleReset = this.handleReset.bind(this);
   }
@@ -21,6 +25,12 @@ class App extends React.Component {
   toggleShowPowerPlantModal() {
     this.setState(prevState => ({
       showPowerPlantMarket: !prevState.showPowerPlantMarket
+    }));
+  }
+
+  toggleShowResourcesModal() {
+    this.setState(prevState => ({
+      showResourcesMarket: !prevState.showResourcesMarket
     }));
   }
 
@@ -120,21 +130,26 @@ class App extends React.Component {
                 currentPlayer={this.state.gameState.currentPlayer}
                 userProfile={this.state.userProfile}
                 players={this.state.gameState.players}
+                ownedPlants={
+                  this.state.gameState.ownedPowerPlants[
+                    this.state.userProfile.uuid
+                  ]
+                }
               />
             </div>
             <div className="resourcesContainer">
               <div className="containerTitle">Resources Market</div>
             </div>
-            <div className="userContainer">
-              <div className="containerTitle">
-                {this.state.userProfile.name}
-              </div>
-            </div>
+            <PlayersTray state={this.state} />
 
             <div className="marketContainer">
               <PowerPlantMarket
                 state={this.state}
                 parentToggle={this.toggleShowPowerPlantModal}
+              />
+              <ResourcesMarket
+                state={this.state}
+                parentToggle={this.toggleShowResourcesModal}
               />
             </div>
             {/* <div className="playersContainer">

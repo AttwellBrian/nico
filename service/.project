@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.buildship.core.gradleprojectnature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>dist</name>
+			<type>2</type>
+			<location>/Users/johnson/Dropbox/Fun/nico/nico/frontend/dist</location>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -2,6 +2,23 @@ import axios from "axios";
 import * as constants from "./constants";
 import { bake_cookie, read_cookie, delete_cookie } from "sfcookies";
 
+function formatMoney(x) {
+  if (x === null || typeof x === "undefined") {
+    x = 0;
+  }
+  x = x.toString().replace(/[.](?=.*?\.)/g, "");
+  x = x.replace(/[^0-9.]/g, "");
+  x = parseFloat(x).toFixed(0);
+  if (x < 0) {
+    x = x * -1;
+    return "-$" + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  } else if (x > 0) {
+    return "$" + x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  } else {
+    return "$0";
+  }
+}
+
 function pyth(x, y) {
   if (typeof x !== "number" || typeof y !== "number") return false;
   return Math.sqrt(x * x + y * y);
@@ -290,7 +307,7 @@ function apiAuctionAction(actionType, userId, plantId, bid) {
       // Only certain types qualify as "Simple requests" (and thus do not require the preflight request).
       // Used for local dev setup. This is needed for local dev setup.
       // See https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS#Simple_requests
-      'Content-Type': "text/plain"
+      "Content-Type": "text/plain"
     }
   };
   axios
@@ -321,6 +338,7 @@ function newPlayer(player) {
 }
 
 export {
+  formatMoney,
   pyth,
   radians_to_degrees,
   generateMap,

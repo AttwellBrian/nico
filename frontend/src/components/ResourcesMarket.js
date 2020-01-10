@@ -6,29 +6,23 @@ import PassButton from "./PassButton";
 
 import * as tools from "../functions";
 
-class PowerPlantMarket extends React.Component {
+class ResourcesMarket extends React.Component {
   constructor(props) {
     super(props);
     this.state = {};
     this.toggleModal = this.toggleModal.bind(this);
-    this.handleSubmitBid = this.handleSubmitBid.bind(this);
   }
 
   toggleModal() {
     this.props.parentToggle();
   }
-
-  handleSubmitBid(bid) {
-    tools.apiAuctionAction("BID", this.props.state.userProfile.uuid, null, bid);
-  }
-
   componentDidUpdate() {}
 
   render() {
     // render city position
     const userProfile = this.props.state.userProfile;
     const gameState = this.props.state.gameState;
-    const showModal = this.props.state.showPowerPlantMarket;
+    const showModal = this.props.state.showResourcesMarket;
 
     let biddingStatus = "Not in bidding phase";
     if (gameState.gamePhase === "auctionPickPlant") {
@@ -84,7 +78,7 @@ class PowerPlantMarket extends React.Component {
     return (
       <div>
         <Button color="primary" onClick={this.toggleModal}>
-          Power Plant Market
+          Resources Market
         </Button>
         <Modal
           isOpen={showModal}
@@ -97,7 +91,7 @@ class PowerPlantMarket extends React.Component {
               <Col xl={9}>
                 <Row>
                   <Col>
-                    <h1>The Power Plant Market</h1>
+                    <h1>The Resource Market</h1>
                   </Col>
                 </Row>
                 <Row className="mt-2">
@@ -167,4 +161,4 @@ class PowerPlantMarket extends React.Component {
   }
 }
 
-export default PowerPlantMarket;
+export default ResourcesMarket;

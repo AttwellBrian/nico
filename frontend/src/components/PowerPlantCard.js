@@ -1,5 +1,7 @@
 import React from "react";
 import { Card, CardBody, Button, Row, Col } from "reactstrap";
+import BidInput from "./BidInput";
+
 import * as tools from "../functions";
 
 class PowerPlantCard extends React.Component {
@@ -11,12 +13,12 @@ class PowerPlantCard extends React.Component {
 
   componentDidUpdate() {}
 
-  handleStartBid() {
+  handleStartBid(bid) {
     tools.apiAuctionAction(
       "CHOOSE_PLANT",
       this.props.userId,
       this.props.plantId,
-      this.props.cost
+      bid
     );
   }
 
@@ -61,9 +63,10 @@ class PowerPlantCard extends React.Component {
         </div>
         {this.props.clickable === true && (
           <div>
-            <Button onClick={this.handleStartBid}>
-              Bid: ${this.props.cost}
-            </Button>
+            <BidInput
+              minValue={this.props.cost}
+              onClick={this.handleStartBid}
+            />
           </div>
         )}
       </div>
